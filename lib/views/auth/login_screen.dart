@@ -1,7 +1,39 @@
+import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../Constants/app_colors.dart';
+import 'package:flutter/services.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _phoneController = TextEditingController();
+  bool isValidNumber = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Listen for phone number changes
+    _phoneController.addListener(() {
+      setState(() {
+        isValidNumber = _phoneController.text.length == 10;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,27 +41,25 @@ class LoginScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.bgColor,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.04, // 6% of screen width
+            horizontal: screenWidth * 0.04,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top navigation bar
               SizedBox(height: screenHeight * 0.08),
 
-
-              // Licious Logo
+              // Logo
               Center(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20), // fully rounded
+                  borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
                     'assets/images/applogo.png',
-                    width: 60,
-                    height: 60,
+                    width: 80,
+                    height: 80,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -37,63 +67,73 @@ class LoginScreen extends StatelessWidget {
 
               SizedBox(height: screenHeight * 0.045),
 
-              // Login with mobile number text
               Text(
                 'Login with your mobile number',
                 style: TextStyle(
                   fontSize: screenWidth * 0.045,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w700,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
 
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height: screenHeight * 0.04),
 
-              // Mobile number input field
+              // Phone Input
               Container(
+                height: screenHeight * 0.065,
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      spreadRadius: 0.5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Country code
-                    Container(
+                    Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.04,
-                        vertical: screenHeight * 0.022,
                       ),
                       child: Text(
                         '+91',
                         style: TextStyle(
-                          fontSize: screenWidth * 0.045,
-                          color: Colors.black87,
+                          fontSize: screenWidth * 0.043,
+                          color: AppColors.black,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    // Divider line
                     Container(
                       width: 1,
                       height: screenHeight * 0.03,
-                      color: Colors.grey[300],
+                      color: AppColors.hintTextGrey,
                     ),
-                    // Phone number input
                     Expanded(
                       child: TextField(
+                        controller: _phoneController,
                         keyboardType: TextInputType.phone,
+                        maxLength: 10,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         decoration: InputDecoration(
+                          counterText: "",
                           hintText: 'Enter Mobile Number',
                           hintStyle: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: screenWidth * 0.045,
-                            fontWeight: FontWeight.w400,
+                            color: AppColors.hintTextGrey,
+                            fontSize: screenWidth * 0.043,
+                            fontWeight: FontWeight.w500,
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.04,
-                            vertical: screenHeight * 0.022,
+                            vertical: screenHeight * 0.015,
                           ),
                         ),
                       ),
@@ -102,30 +142,52 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
 
-              // Spacer to push content to bottom
-              Spacer(),
+              const Spacer(),
 
               // Get OTP Button
               Container(
                 width: double.infinity,
                 height: screenHeight * 0.065,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Get OTP functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[400],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 1,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 2),
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Get OTP',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.045,
-                      fontWeight: FontWeight.w600,
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: ElevatedButton(
+                      onPressed: isValidNumber
+                          ? () {
+                        Get.toNamed(
+                          AppRoutes.otpVerification,
+                          arguments: {
+                            "phoneNumber": "+91 ${_phoneController.text}",
+                          },
+                        );
+                      }
+                          : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isValidNumber
+                          ? AppColors.primary
+                          : AppColors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'Get OTP',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: screenWidth * 0.042,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -133,32 +195,34 @@ class LoginScreen extends StatelessWidget {
 
               SizedBox(height: screenHeight * 0.015),
 
-              // Terms and conditions
+              // Terms
               Center(
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.022,
-                      color: Colors.grey[600],
-                      height: 1.4,
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.028,
+                      color: AppColors.darkGrey,
+                      height: 1,
                     ),
                     children: [
-                      TextSpan(text: 'By logging in, you agree to our '),
+                      const TextSpan(text: 'By logging in, you agree to our '),
                       TextSpan(
                         text: 'Terms & Conditions',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
+                        style: GoogleFonts.nunito(
+                          fontSize: screenWidth * 0.030,
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                      TextSpan(text: ' and '),
+                      const TextSpan(text: ' and '),
                       TextSpan(
                         text: 'Privacy Policy',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w500,
+                        style: GoogleFonts.nunito(
+                          fontSize: screenWidth * 0.030,
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -166,7 +230,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: screenHeight * 0.02),
             ],
           ),

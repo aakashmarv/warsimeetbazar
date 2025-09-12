@@ -12,7 +12,7 @@ class AppTheme {
       background: AppColors.lightBackground,
       error: AppColors.errorRed,
     ),
-    textTheme: GoogleFonts.interTextTheme(
+    textTheme: GoogleFonts.rubikTextTheme(
       ThemeData.light().textTheme,
     ).apply(
       bodyColor: AppColors.lightText,
@@ -36,7 +36,7 @@ class AppTheme {
       background: AppColors.darkBackground,
       error: AppColors.errorRed,
     ),
-    textTheme: GoogleFonts.interTextTheme(
+    textTheme: GoogleFonts.rubikTextTheme(
       ThemeData.dark().textTheme,
     ).apply(
       bodyColor: AppColors.darkText,
