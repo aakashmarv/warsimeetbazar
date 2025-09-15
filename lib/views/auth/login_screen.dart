@@ -1,7 +1,6 @@
 import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
@@ -149,18 +148,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: screenHeight * 0.065,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      blurRadius: 1,
+                      color: AppColors.grey.withOpacity(0.5),
+                      blurRadius: 3,
                       spreadRadius: 1,
-                      offset: const Offset(0, 2),
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(16),
                   child: ElevatedButton(
                       onPressed: isValidNumber
                           ? () {
@@ -206,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 1,
                     ),
                     children: [
-                      const TextSpan(text: 'By logging in, you agree to our '),
+                      const TextSpan(text: 'By continuing, you accept our '),
                       TextSpan(
                         text: 'Terms & Conditions',
                         style: GoogleFonts.nunito(
@@ -216,16 +215,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                      const TextSpan(text: ' and '),
-                      TextSpan(
-                        text: 'Privacy Policy',
-                        style: GoogleFonts.nunito(
-                          fontSize: screenWidth * 0.030,
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
+                      // const TextSpan(text: ' and '),
+                      // TextSpan(
+                      //   text: 'Privacy Policy',
+                      //   style: GoogleFonts.nunito(
+                      //     fontSize: screenWidth * 0.030,
+                      //     color: AppColors.black,
+                      //     fontWeight: FontWeight.w600,
+                      //     decoration: TextDecoration.underline,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

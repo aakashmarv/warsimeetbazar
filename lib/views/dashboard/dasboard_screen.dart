@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../Constants/app_colors.dart';
 import 'home_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -17,8 +20,114 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const HomeScreen(),
     Center(child: Text("Categories")),
     Center(child: Text("Search")),
+    Center(child: Text("Orders")),
     Center(child: Text("Account")),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // System navigation bar style
+    // SystemChrome.setSystemUIOverlayStyle(
+    //   const SystemUiOverlayStyle(
+    //     systemNavigationBarColor: AppColors.white, // background white
+    //     systemNavigationBarIconBrightness: Brightness.dark, // icons grey/dark
+    //   ),
+    // );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showLocationBottomSheet();
+    });
+  }
+
+  Future<void> _requestPermissions() async {
+    // Location Permission
+    var locationStatus = await Permission.locationWhenInUse.request();
+    if (locationStatus.isDenied) {
+      // show snackbar or alert if user denied
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Location permission is required")),
+      );
+    }
+
+    // Notification Permission (Android 13+ / iOS)
+    var notificationStatus = await Permission.notification.request();
+    if (notificationStatus.isDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Notification permission is required")),
+      );
+    }
+  }
+  void _showLocationBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false, // bahar tap se close na ho
+      enableDrag: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () async {
+            SystemNavigator.pop(); // back press -> app exit
+            return false;
+          },
+          child: SafeArea(
+            minimum: const EdgeInsets.only(bottom: 16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Set Your Location",
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _requestPermissions();
+                    },
+                    child: const Text("Use Current Location"),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      foregroundColor: AppColors.black,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _requestPermissions();
+                    },
+                    child: const Text("Set on Map"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             width: screenWidth,
             padding: EdgeInsets.only(
-              top: statusBarHeight + 8, // status bar ke neeche se start hoga
+              top: statusBarHeight + 8,
               left: screenWidth * 0.04,
               right: screenWidth * 0.04,
               bottom: screenHeight * 0.012,
@@ -75,9 +184,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                Image.asset(
-                      "assets/images/logocb.png",
+                      "assets/images/logo_cb_black.png",
                       height: screenWidth * 0.10,
-                      width: screenWidth * 0.10,
+                      width: screenWidth * 0.20,
                       fit: BoxFit.cover,
                     ),
 
@@ -116,21 +225,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: AppColors.white,
         currentIndex: _currentIndex,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.grey,
+        unselectedItemColor: AppColors.darkGrey,
         type: BottomNavigationBarType.fixed,
+        selectedFontSize: 14,
+        unselectedFontSize: 12,
+        iconSize: 24,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Categories"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: "Orders"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.house),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.layers2),
+            label: "Categories",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.search),
+            label: "Search",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.shoppingBag),
+            label: "Orders",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(LucideIcons.user),
+            label: "Account",
+          ),
         ],
       ),
+
+
     );
   }
 }

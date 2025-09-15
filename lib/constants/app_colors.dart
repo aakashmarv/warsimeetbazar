@@ -11,7 +11,7 @@ class AppColors {
   static const Color extraLightestPrimary = Color(0xFFfff0f2);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  static const Color bgColor = Color(0xFFFAFAFA); // softer white
+  static const Color bgColor = Color(0xFFF4F4F4); // softer white
 
   // Greys
   static const Color grey = Color(0xFFB3B2B2); // base grey

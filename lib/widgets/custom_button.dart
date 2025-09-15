@@ -9,6 +9,9 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double borderRadius;
   final double fontSize;
+  final bool withShadow;
+  final double? width;
+  final double? height;
 
   const CustomButton({
     Key? key,
@@ -16,8 +19,11 @@ class CustomButton extends StatelessWidget {
     required this.onTap,
     this.backgroundColor = AppColors.primary,
     this.textColor = AppColors.white,
-    this.borderRadius = 18,
+    this.borderRadius = 16,
     this.fontSize = 16,
+    this.withShadow = false,
+    this.width,
+    this.height,
   }) : super(key: key);
 
   @override
@@ -28,11 +34,21 @@ class CustomButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        height: screenHeight * 0.065,
+        width: width ?? double.infinity,
+        height: height ?? screenHeight * 0.065,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(borderRadius),
+          boxShadow: withShadow
+              ? [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.4),
+              blurRadius: 8,
+              spreadRadius: 1,
+              offset: const Offset(0, 3),
+            ),
+          ]
+              : [],
         ),
         alignment: Alignment.center,
         child: Text(

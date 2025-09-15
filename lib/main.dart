@@ -9,7 +9,6 @@ import 'constants/app_strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final prefs = await SharedPreferencesService.getInstance();
   final appStateController = AppStateController(prefs);
   await appStateController.initialize();

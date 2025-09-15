@@ -1,6 +1,10 @@
 import 'package:dry_fish/views/auth/login_screen.dart';
 import 'package:dry_fish/views/auth/otp_verification_screen.dart';
+import 'package:dry_fish/views/cart/cart_screen.dart';
 import 'package:dry_fish/views/dashboard/dasboard_screen.dart';
+import 'package:dry_fish/views/onboarding/onboarding_screen.dart';
+import 'package:dry_fish/views/order/order_confirmation_screen.dart';
+import 'package:dry_fish/views/order/order_tracking_screen.dart';
 import 'package:dry_fish/views/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -8,7 +12,11 @@ class AppRoutes {
   static const splash = '/splash';
   static const login = '/login';
   static const otpVerification = '/otpVerification';
+  static const onboarding = '/onboarding';
   static const dashBoard = '/dashBoard';
+  static const cart = '/cart';
+  static const orderConfirmer = '/orderConfirmer';
+  static const orderTracking = '/orderTracking';
 
   static const _defaultTransition = Transition.cupertino;
   static const _transitionDuration = Duration(milliseconds: 500);
@@ -30,8 +38,11 @@ class AppRoutes {
       _buildPage(name: splash, page: () => SplashScreen()),
       _buildPage(name: login, page: () => LoginScreen()),
       _buildPage(name: otpVerification, page: () {final args = Get.arguments as Map<String, dynamic>;return OtpVerificationScreen(phoneNumber: args['phoneNumber']);},),
-      _buildPage(name: dashBoard, page: () => DashboardScreen())
-
+      _buildPage(name: dashBoard, page: () => DashboardScreen()),
+      _buildPage(name: onboarding, page: () => OnboardingScreen()),
+      _buildPage(name: cart, page: () => CartScreen()),
+      _buildPage(name: orderConfirmer, page: () => OrderConfirmationScreen()),
+      _buildPage(name: orderTracking, page: () => OrderTrackingScreen()),
 
     ];
   }

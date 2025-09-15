@@ -40,6 +40,9 @@ dependencies:
   google_fonts: ^6.3.1
   pinput: ^5.0.2
   cached_network_image: ^3.4.1
+  lucide_icons_flutter: ^3.1.0
+  permission_handler: ^12.0.1
+  google_maps_flutter: ^2.13.1
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +78,7 @@ flutter:
   assets:
     - assets/images/
     - assets/animations/
+    - assets/images/onbordImages/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
