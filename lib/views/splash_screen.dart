@@ -61,30 +61,43 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final imageSize = screenWidth * 0.45; // 45% of screen width
+    final imageSize = screenWidth * 0.60; // 60% of screen width
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(imageSize * 0.25),
-              child: Image.asset(
-                'assets/images/splashlogo.png',
-                height: imageSize,
-                width: imageSize,
-                fit: BoxFit.cover,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background watermark image with fade-in
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: Image.asset(
+              'assets/images/bgImages/splashBg.jpeg',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          Center(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(imageSize * 0.25),
+                  child: Image.asset(
+                    'assets/images/splashlogo.png',
+                    height: imageSize,
+                    width: imageSize,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
-
 }
 
 // import 'dart:async';

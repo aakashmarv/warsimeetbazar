@@ -132,9 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
             SizedBox(height: screenHeight * 0.01),
-
             // Shop by Category Section
             Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
@@ -198,59 +196,70 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Container(
                     width: screenWidth * 0.7,
                     margin: EdgeInsets.only(right: screenWidth * 0.04),
-                    padding: EdgeInsets.all(screenWidth * 0.04),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.black12,
-                      //     blurRadius: 8,
-                      //     offset: Offset(0, 4),
-                      //   ),d
-                      // ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        // Customer name + rating
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              review["name"],
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.04,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.black,
-                              ),
+                        // Watermark background
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              "assets/images/bgImages/reviewWhatermark.jpg",
+                              fit: BoxFit.cover,
                             ),
-                            Row(
-                              children: List.generate(
-                                5,
-                                    (star) => Icon(
-                                  Icons.star,
-                                  size: screenWidth * 0.045,
-                                  color: star < review["rating"]
-                                      ? Colors.amber
-                                      : Colors.grey.shade300,
+                          ),
+                        ),
+
+                        // Review content
+                        Container(
+                          padding: EdgeInsets.all(screenWidth * 0.04),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Customer name + rating
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    review["name"],
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: List.generate(
+                                      5,
+                                          (star) => Icon(
+                                        Icons.star,
+                                        size: screenWidth * 0.045,
+                                        color: star < review["rating"]
+                                            ? Colors.amber
+                                            : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: screenHeight * 0.01),
+
+                              // Comment
+                              Expanded(
+                                child: Text(
+                                  review["comment"],
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.035,
+                                    color: AppColors.darkGrey,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.01),
-
-                        // Comment
-                        Expanded(
-                          child: Text(
-                            review["comment"],
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.035,
-                              color: AppColors.darkGrey,
-                            ),
+                            ],
                           ),
                         ),
                       ],

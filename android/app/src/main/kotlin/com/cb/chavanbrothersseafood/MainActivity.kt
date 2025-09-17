@@ -1,4 +1,4 @@
-package com.df.dry_fish
+package com.cb.chavanbrothersseafood
 
 import io.flutter.embedding.android.FlutterActivity
 
