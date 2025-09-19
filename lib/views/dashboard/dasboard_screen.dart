@@ -1,8 +1,13 @@
+import 'package:dry_fish/views/account/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../Constants/app_colors.dart';
+import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,14 +19,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _currentIndex = 0;
+  final DashboardController controller = Get.put(DashboardController());
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    Center(child: Text("Categories")),
     Center(child: Text("Search")),
-    Center(child: Text("Orders")),
-    Center(child: Text("Account")),
+    Center(child: Text("Categories")),
+    AccountScreen(),
+    Center(child: Text("Cart")),
   ];
 
   @override
@@ -58,6 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
   }
+
   void _showLocationBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -138,128 +144,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      body: Column(
-        children: [
-          // Custom AppBar
-          Container(
-            width: screenWidth,
-            padding: EdgeInsets.only(
-              top: statusBarHeight + 8,
-              left: screenWidth * 0.04,
-              right: screenWidth * 0.04,
-              bottom: screenHeight * 0.012,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        const Icon(Icons.location_on, color: AppColors.alertRed),
-                        SizedBox(width: screenWidth * 0.01),
-                        Text(
-                          "Sector C",
-                          style: GoogleFonts.nunito(
-                            fontSize: screenWidth * 0.045,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ],),
-                      Text(
-                        "569/153-GA, Kanpur Rd, adjacent...",
-                        style: GoogleFonts.nunito(
-                          fontSize: screenWidth * 0.030,
-                          color: AppColors.darkGrey,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
+      body: Obx(
+            () => Column(
+          children: [
+            /// Show AppBar only for index 0
+            if (controller.currentIndex.value == 0)
+              Container(
+                width: screenWidth,
+                padding: EdgeInsets.only(
+                  top: statusBarHeight + 8,
+                  left: screenWidth * 0.04,
+                  right: screenWidth * 0.04,
+                  bottom: screenHeight * 0.012,
                 ),
-               Image.asset(
+                color: AppColors.white,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on,
+                                  color: AppColors.alertRed),
+                              SizedBox(width: screenWidth * 0.01),
+                              Text(
+                                "Sector C",
+                                style: GoogleFonts.nunito(
+                                  fontSize: screenWidth * 0.045,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            "569/153-GA, Kanpur Rd, adjacent...",
+                            style: GoogleFonts.nunito(
+                              fontSize: screenWidth * 0.030,
+                              color: AppColors.darkGrey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(
                       "assets/images/logo_cb_black.png",
                       height: screenWidth * 0.10,
-                      width: screenWidth * 0.20,
+                      width: screenWidth * 0.18,
                       fit: BoxFit.cover,
                     ),
+                  ],
+                ),
+              ),
 
-                // Expanded(
-                //   flex: 2,
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: [
-                //       Icon(Icons.access_time, color: AppColors.primary, size: screenWidth * 0.05),
-                //       SizedBox(width: screenWidth * 0.01),
-                //       Flexible(
-                //         child: Text(
-                //           "Delivering Tomorrow",
-                //           style: GoogleFonts.nunito(
-                //             fontSize: screenWidth * 0.032,
-                //             fontWeight: FontWeight.w600,
-                //             color: AppColors.black,
-                //           ),
-                //           overflow: TextOverflow.ellipsis,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-              ],
+            /// Selected Screen
+            Expanded(child: _screens[controller.currentIndex.value]),
+          ],
+        ),
+      ),
+
+      /// Bottom Navigation Bar
+      bottomNavigationBar: Obx(
+            () => BottomNavigationBar(
+          backgroundColor: AppColors.white,
+          currentIndex: controller.currentIndex.value,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.darkGrey,
+          type: BottomNavigationBarType.fixed,
+          selectedFontSize: 14,
+          unselectedFontSize: 12,
+          iconSize: 24,
+          onTap: controller.changeIndex,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.house),
+              label: "Home",
             ),
-          ),
-
-          // Selected Screen
-          Expanded(child: _screens[_currentIndex]),
-        ],
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.search),
+              label: "Search",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.layers2),
+              label: "Categories",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.user),
+              label: "Account",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(LucideIcons.shoppingBag),
+              label: "Cart",
+            ),
+          ],
+        ),
       ),
-
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.white,
-        currentIndex: _currentIndex,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.darkGrey,
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 14,
-        unselectedFontSize: 12,
-        iconSize: 24,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.house),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.layers2),
-            label: "Categories",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.search),
-            label: "Search",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.shoppingBag),
-            label: "Orders",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.user),
-            label: "Account",
-          ),
-        ],
-      ),
-
-
     );
   }
 }

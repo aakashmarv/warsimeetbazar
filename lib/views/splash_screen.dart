@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     await Future.delayed(const Duration(seconds: 3));
 
     if (!isLogged) {
-      Get.offAllNamed(AppRoutes.onboarding);
+      Get.offAllNamed(AppRoutes.dashBoard);
     }  else {
       Get.offAllNamed(AppRoutes.dashBoard);
     }

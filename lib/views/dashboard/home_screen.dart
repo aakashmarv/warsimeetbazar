@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(height: screenHeight * 0.02),
-            // Horizontal Scroll - Products
+            // Bestsellers Section
             Padding(
               padding: EdgeInsets.only(left: screenWidth * 0.03),
               child: SizedBox(
@@ -303,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      width: screenWidth * 0.56,
+      width: screenWidth * 0.58,
       margin: EdgeInsets.only(right: screenWidth * 0.04),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
