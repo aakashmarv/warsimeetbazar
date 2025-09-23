@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
         .width;
 
     return Scaffold(
-      // backgroundColor: AppColors.bgColor,
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
@@ -195,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isValidNumber
                               ? AppColors.primary
-                              : AppColors.grey,
+                              : AppColors.alertRed,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),
