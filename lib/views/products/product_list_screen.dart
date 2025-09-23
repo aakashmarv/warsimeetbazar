@@ -89,6 +89,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final ratio = screenWidth / (screenHeight * 0.8);
 
     final selectedCategory = categories[selectedIndex];
     final categoryProducts = products[selectedCategory] ?? [];
@@ -96,6 +97,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(selectedCategory),
+        centerTitle: true,
         backgroundColor: AppColors.primary,
       ),
       body: Row(
@@ -158,62 +160,69 @@ class _ProductListScreenState extends State<ProductListScreen> {
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: screenWidth * 0.03,
-                mainAxisSpacing: screenHeight * 0.01,
-                childAspectRatio: 0.60,
+                // mainAxisSpacing: screenHeight * 0.01,
+                  childAspectRatio: ratio // card height adjust
               ),
               itemBuilder: (context, index) {
                 final product = categoryProducts[index];
                 return InkWell(
-                  onTap: (){
-                    Get.to( ProductDetailScreen(
+                  onTap: () {
+                    Get.to(ProductDetailScreen(
                       productName: product["title"]!,
                       imageUrl: product["image"]!,
-                    ),);
+                    ));
                   },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent, // Transparent container
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Image section
                         ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
-                          ),
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
                             product["image"]!,
-                            height: screenHeight * 0.15,
+                            height: screenHeight * 0.14,
                             width: double.infinity,
                             fit: BoxFit.cover,
                           ),
                         ),
 
-                        // Text section take remaining space
+                        // Text section
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.all(8),
+                            padding: EdgeInsets.all(screenWidth * 0.025),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   product["title"]!,
-                                  maxLines: 2,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: screenWidth * 0.035,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height : 4),
+                                Text(
+                                  "(sdkhfksjfklssdljk dkshf sdlhfsdkhfisdo sdiohfifj)",
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppColors.darkGrey,
+                                    fontSize: screenWidth * 0.030,
+                                  ),
+                                ),
+                                 SizedBox(height: 12),
                                 Text(
                                   product["price"]!,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.035,
+                                    fontSize: screenWidth * 0.036,
                                     color: AppColors.black,
                                   ),
                                 ),
@@ -225,10 +234,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                   ),
                 );
-
               },
             ),
-          ),
+          )
+
         ],
       ),
     );
