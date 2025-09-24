@@ -1,4 +1,6 @@
 import 'package:dry_fish/views/account/account_screen.dart';
+import 'package:dry_fish/views/cart/cart_screen.dart';
+import 'package:dry_fish/views/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -23,10 +25,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    Center(child: Text("Search")),
+    SearchScreen(),
     Center(child: Text("Categories")),
     AccountScreen(),
-    Center(child: Text("Cart")),
+    CartScreen(),
   ];
 
   @override

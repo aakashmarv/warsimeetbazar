@@ -211,7 +211,7 @@ class _CartScreenState extends State<CartScreen> {
                       text: "Add Address",
                       withShadow: true,
                       onTap: () {
-                        Get.toNamed(AppRoutes.orderConfirmer);
+                        Get.toNamed(AppRoutes.newAddress);
                       },
                     ),
                   ],

@@ -7,6 +7,7 @@ import '../../widgets/custom_button.dart';
 class ProductDetailScreen extends StatefulWidget {
   final String productName;
   final String imageUrl;
+
   const ProductDetailScreen({
     super.key,
     required this.productName,
@@ -47,10 +48,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       bottomLeft: Radius.circular(24),
                       bottomRight: Radius.circular(24),
                     ),
-                    child: Image.asset(
-                      widget.imageUrl,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.asset(widget.imageUrl, fit: BoxFit.cover),
                   ),
                 ),
                 leading: Padding(
@@ -71,7 +69,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       width: 44,
                       height: 44,
                       child: _buildCircleIcon(
-                        icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                        icon: isFavorite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
                         color: isFavorite ? Colors.red : Colors.black,
                         onTap: () {
                           setState(() => isFavorite = !isFavorite);
@@ -80,8 +80,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                 ],
-
               ),
+
               /// Product Info
               SliverToBoxAdapter(
                 child: Padding(
@@ -106,9 +106,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
 
                       const SizedBox(height: 20),
-                      Text("Select Cut",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16)),
+                      Text(
+                        "Select Cut",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 10,
@@ -116,9 +120,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           return ChoiceChip(
                             label: Text(cut),
                             selected: selectedCut == cut,
-                            selectedColor: AppColors.primary, // solid color
+                            selectedColor: AppColors.primary,
+                            // solid color
                             labelStyle: TextStyle(
-                              color: selectedCut == cut ? Colors.white : Colors.black,
+                              color: selectedCut == cut
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.w500,
                             ),
                             onSelected: (val) {
@@ -129,9 +136,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
 
                       const SizedBox(height: 20),
-                      Text("Weight",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16)),
+                      Text(
+                        "Weight",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 10,
@@ -141,7 +152,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             selected: selectedWeight == w,
                             selectedColor: AppColors.primary,
                             labelStyle: TextStyle(
-                              color: selectedWeight == w ? Colors.white : Colors.black,
+                              color: selectedWeight == w
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.w500,
                             ),
                             onSelected: (val) {
@@ -166,16 +179,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           Row(
                             children: [
                               IconButton(
-                                icon:
-                                const Icon(Icons.remove_circle_outline),
+                                icon: const Icon(Icons.remove_circle_outline),
                                 onPressed: () {
                                   if (quantity > 1) {
                                     setState(() => quantity--);
                                   }
                                 },
                               ),
-                              Text(quantity.toString(),
-                                  style: const TextStyle(fontSize: 18)),
+                              Text(
+                                quantity.toString(),
+                                style: const TextStyle(fontSize: 18),
+                              ),
                               IconButton(
                                 icon: const Icon(Icons.add_circle_outline),
                                 onPressed: () {
@@ -187,13 +201,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                       SizedBox(height: screenHeight * 0.12), // for spacing
-
                     ],
                   ),
                 ),
               ),
             ],
           ),
+
           /// Sticky Add to Cart Button
           Positioned(
             bottom: 0,
@@ -206,24 +220,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   vertical: screenHeight * 0.015,
                 ),
                 child: CustomButton(
-                text: "Add to Cart",
-    withShadow: true,
-    onTap: () {
-    Get.toNamed(
-    AppRoutes.cart,
-    arguments: {
-    "name": widget.productName,
-    "image": widget.imageUrl,
-    "cut": selectedCut,
-    "weight": selectedWeight,
-    "qty": quantity,
-    "price": 450, // or dynamic price if you have
-    },
-    );
-    },
-    ),
-
-    ),
+                  text: "Add to Cart",
+                  withShadow: true,
+                  onTap: () {
+                    Get.toNamed(
+                      AppRoutes.cart,
+                      arguments: {
+                        "name": widget.productName,
+                        "image": widget.imageUrl,
+                        "cut": selectedCut,
+                        "weight": selectedWeight,
+                        "qty": quantity,
+                        "price": 450, // or dynamic price if you have
+                      },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ],
@@ -241,8 +254,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(30),
       child: Container(
-        height: 40,  // fixed size
-        width: 40,   // fixed size
+        height: 40, // fixed size
+        width: 40, // fixed size
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.3),
           shape: BoxShape.circle,
@@ -251,12 +264,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               color: Colors.black12,
               blurRadius: 6,
               offset: Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Icon(icon, color: color, size: 22),
       ),
     );
   }
-
 }

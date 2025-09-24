@@ -1,3 +1,4 @@
+import 'package:dry_fish/views/address/new_address_screen.dart';
 import 'package:dry_fish/views/auth/login_screen.dart';
 import 'package:dry_fish/views/auth/otp_verification_screen.dart';
 import 'package:dry_fish/views/cart/cart_screen.dart';
@@ -5,6 +6,7 @@ import 'package:dry_fish/views/dashboard/dasboard_screen.dart';
 import 'package:dry_fish/views/onboarding/onboarding_screen.dart';
 import 'package:dry_fish/views/order/order_confirmation_screen.dart';
 import 'package:dry_fish/views/order/order_tracking_screen.dart';
+import 'package:dry_fish/views/search_screen.dart';
 import 'package:dry_fish/views/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -17,6 +19,8 @@ class AppRoutes {
   static const cart = '/cart';
   static const orderConfirmer = '/orderConfirmer';
   static const orderTracking = '/orderTracking';
+  static const newAddress = '/newAddress';
+  static const search = '/search';
 
   static const _defaultTransition = Transition.cupertino;
   static const _transitionDuration = Duration(milliseconds: 500);
@@ -43,6 +47,8 @@ class AppRoutes {
       _buildPage(name: cart, page: () => CartScreen()),
       _buildPage(name: orderConfirmer, page: () => OrderConfirmationScreen()),
       _buildPage(name: orderTracking, page: () => OrderTrackingScreen()),
+      _buildPage(name: newAddress, page: () => NewAddressScreen()),
+      _buildPage(name: search, page: () => SearchScreen()),
 
     ];
   }

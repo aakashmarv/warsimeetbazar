@@ -5,6 +5,7 @@ import 'package:dry_fish/utils/thems/app_theme.dart';
 import 'package:dry_fish/viewmodels/app_state_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'constants/app_strings.dart';
 
 Future<void> main() async {
@@ -28,19 +29,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Get.find<AppStateController>();
-    return Obx(()=>GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: AppStrings.appName,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.lightTheme,
-      themeMode: appState.themeMode.value,
-
-      // useInheritedMediaQuery: true,
-      // locale: DevicePreview.locale(context),
-      // builder: DevicePreview.appBuilder,
-
-      initialRoute: AppRoutes.splash,
-      getPages: AppRoutes.getRoutes(),
-    ));
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return Obx(
+          () => GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: AppStrings.appName,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.lightTheme,
+            themeMode: appState.themeMode.value,
+            // useInheritedMediaQuery: true,
+            // locale: DevicePreview.locale(context),
+            // builder: DevicePreview.appBuilder,
+            initialRoute: AppRoutes.splash,
+            getPages: AppRoutes.getRoutes(),
+          ),
+        );
+      },
+    );
   }
 }
