@@ -89,7 +89,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final ratio = screenWidth / (screenHeight * 0.8);
+    final ratio = screenWidth / (screenHeight * 0.78);
 
     final selectedCategory = categories[selectedIndex];
     final categoryProducts = products[selectedCategory] ?? [];
@@ -154,87 +154,89 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
           /// Right side product grid (scrollable separately)
           Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.all(screenWidth * 0.02),
-              itemCount: categoryProducts.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: screenWidth * 0.03,
-                // mainAxisSpacing: screenHeight * 0.01,
-                  childAspectRatio: ratio // card height adjust
-              ),
-              itemBuilder: (context, index) {
-                final product = categoryProducts[index];
-                return InkWell(
-                  onTap: () {
-                    Get.to(ProductDetailScreen(
-                      productName: product["title"]!,
-                      imageUrl: product["image"]!,
-                    ));
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.transparent, // Transparent container
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Image section
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            product["image"]!,
-                            height: screenHeight * 0.14,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-
-                        // Text section
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.all(screenWidth * 0.025),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product["title"]!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: screenWidth * 0.035,
-                                  ),
-                                ),
-                                SizedBox(height : 4),
-                                Text(
-                                  "(sdkhfksjfklssdljk dkshf sdlhfsdkhfisdo sdiohfifj)",
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: AppColors.darkGrey,
-                                    fontSize: screenWidth * 0.030,
-                                  ),
-                                ),
-                                 SizedBox(height: 12),
-                                Text(
-                                  product["price"]!,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenWidth * 0.036,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                              ],
+            child: SafeArea(
+              child: GridView.builder(
+                padding: EdgeInsets.all(screenWidth * 0.02),
+                itemCount: categoryProducts.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: screenWidth * 0.03,
+                    // mainAxisSpacing: screenHeight * 0.015,
+                    childAspectRatio: ratio // card height adjust
+                ),
+                itemBuilder: (context, index) {
+                  final product = categoryProducts[index];
+                  return InkWell(
+                    onTap: () {
+                      Get.to(ProductDetailScreen(
+                        productName: product["title"]!,
+                        imageUrl: product["image"]!,
+                      ));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        // color: AppColors.extraLightestPrimary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Image section
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              product["image"]!,
+                              height: screenHeight * 0.14,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                      ],
+              
+                          // Text section
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(screenWidth * 0.025),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product["title"]!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: screenWidth * 0.035,
+                                    ),
+                                  ),
+                                  SizedBox(height: screenWidth * 0.002),
+                                  Text(
+                                    "(sdkhfksjfklssdljk dkshf sdlhfsdkhfisdo sdiohfifj)",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppColors.darkGrey,
+                                      fontSize: screenWidth * 0.030,
+                                    ),
+                                  ),
+                                   SizedBox(height: screenWidth * 0.013),
+                                  Text(
+                                    product["price"]!,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenWidth * 0.036,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           )
 

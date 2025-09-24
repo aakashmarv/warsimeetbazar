@@ -23,7 +23,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   String selectedWeight = "500g";
   int quantity = 1;
   bool isFavorite = false;
-
+  final List<Map<String, dynamic>> cuts = [
+    {
+      "name": "Curry Cut",
+      "price": 450,
+      "image": "assets/images/banner2.jpg",
+    },
+    {
+      "name": "Fillet",
+      "price": 600,
+      "image": "assets/images/banner2.jpg",
+    },
+    {
+      "name": "Whole",
+      "price": 350,
+      "image": "assets/images/banner2.jpg",
+    },
+  ];
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -85,7 +101,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               /// Product Info
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  padding: EdgeInsets.all(screenWidth * 0.03),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -106,6 +122,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
 
                       const SizedBox(height: 20),
+                      /// Select Cut
+                      const SizedBox(height: 20),
                       Text(
                         "Select Cut",
                         style: TextStyle(
@@ -113,28 +131,136 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 10,
-                        children: ["Curry Cut", "Fillet", "Whole"].map((cut) {
-                          return ChoiceChip(
-                            label: Text(cut),
-                            selected: selectedCut == cut,
-                            selectedColor: AppColors.primary,
-                            // solid color
-                            labelStyle: TextStyle(
-                              color: selectedCut == cut
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            onSelected: (val) {
-                              setState(() => selectedCut = cut);
-                            },
-                          );
-                        }).toList(),
-                      ),
+                      const SizedBox(height: 12),
 
+                       SizedBox(
+                          height: screenHeight * 0.28, // adjust card height
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: cuts.length,
+                            itemBuilder: (context, index) {
+                              final cut = cuts[index];
+                              final isSelected = selectedCut == cut["name"];
+
+                              return Container(
+                                width: screenWidth * 0.40,
+                                margin: EdgeInsets.only(right: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.transparent,
+                                  border: Border.all(
+                                    color: isSelected ? AppColors.primary : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    /// Image
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(12),
+                                      bottom: Radius.circular(12)),
+                                      child: Image.asset(
+                                        cut["image"],
+                                        height: screenHeight * 0.13,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    /// Info + Button
+                                    Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            cut["name"],
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "₹${cut["price"]}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+
+                                          /// Add / Qty Row
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: isSelected
+                                                ? Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: AppColors.primary),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  IconButton(
+                                                    icon: Icon(Icons.remove, color: AppColors.primary),
+                                                    onPressed: () {
+                                                      if (quantity > 1) {
+                                                        setState(() => quantity--);
+                                                      }
+                                                    },
+                                                  ),
+                                                  Text(
+                                                    quantity.toString(),
+                                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.add, color: AppColors.primary),
+                                                    onPressed: () {
+                                                      setState(() => quantity++);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                                : InkWell(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedCut = cut["name"];
+                                                  quantity = 1;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.primary,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  "+",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       const SizedBox(height: 20),
                       Text(
                         "Weight",
@@ -209,36 +335,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
 
           /// Sticky Add to Cart Button
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.05,
-                  vertical: screenHeight * 0.015,
-                ),
-                child: CustomButton(
-                  text: "Add to Cart",
-                  withShadow: true,
-                  onTap: () {
-                    Get.toNamed(
-                      AppRoutes.cart,
-                      arguments: {
-                        "name": widget.productName,
-                        "image": widget.imageUrl,
-                        "cut": selectedCut,
-                        "weight": selectedWeight,
-                        "qty": quantity,
-                        "price": 450, // or dynamic price if you have
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: SafeArea(
+          //     child: Padding(
+          //       padding: EdgeInsets.symmetric(
+          //         horizontal: screenWidth * 0.05,
+          //         vertical: screenHeight * 0.015,
+          //       ),
+          //       child:
+          //       CustomButton(
+          //         text: "Add to Cart",
+          //         withShadow: true,
+          //         onTap: () {
+          //           Get.toNamed(
+          //             AppRoutes.cart,
+          //             arguments: {
+          //               "name": widget.productName,
+          //               "image": widget.imageUrl,
+          //               "cut": selectedCut,
+          //               "weight": selectedWeight,
+          //               "qty": quantity,
+          //               "price": 450, // or dynamic price if you have
+          //             },
+          //           );
+          //         },
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
