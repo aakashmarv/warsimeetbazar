@@ -91,8 +91,10 @@ class _SearchScreenState extends State<SearchScreen>
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 4.w),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.extraLightGrey,
                       borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: AppColors.lightGrey,
+                        width: 1.2,),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12,

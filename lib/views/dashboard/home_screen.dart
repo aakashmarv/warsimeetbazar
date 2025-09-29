@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../Constants/app_colors.dart';
+import '../../roots/routes.dart';
+import '../../viewmodels/cart_controller.dart';
+import '../cart/widgets/floating_cart_bar.dart';
 import '../products/product_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final CartController cartController = Get.put(CartController());
   final List<Map<String, dynamic>> reviews = [
     {
       "name": "Amit Sharma",
@@ -44,233 +48,246 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: screenHeight * 0.02),
-            // Banner (Smooth Carousel)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: SizedBox(
-                height: screenHeight * 0.20,
-                width: double.infinity,
-                child: _buildBanner(context, "assets/images/banner2.jpg"),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.03),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: screenHeight * 0.01),
+                // Banner (Smooth Carousel)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: SizedBox(
+                    height: screenHeight * 0.20,
+                    width: double.infinity,
+                    child: _buildBanner(context, "assets/images/banner2.jpg"),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.02),
 
-            // Bestsellers title
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "Bestsellers",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.050,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "Most popular products near you!",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.035,
-                  color: AppColors.darkGrey,
-                ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.02),
-            // Bestsellers Section
-            Padding(
-              padding: EdgeInsets.only(left: screenWidth * 0.03),
-              child: SizedBox(
-                height: screenHeight * 0.30,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildProductCard(
-                      context,
-                      "assets/images/banner2.jpg",
-                      "Chicken Curry Cut - Small Pieces",
-                      "500 g | 12-18 Pieces | Serves 4",
-                      "₹171",
-                      "₹209",
-                      "18% off",
+                // Bestsellers title
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "Bestsellers",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.050,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
                     ),
-                    _buildProductCard(
-                      context,
-                      "assets/images/banner2.jpg",
-                      "Chicken Curry Cut - Big Pieces",
-                      "500 g | 7-11 Pieces | Serves 3",
-                      "₹171",
-                      "₹209",
-                      "18% off",
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "Most popular products near you!",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.035,
+                      color: AppColors.darkGrey,
                     ),
-                    _buildProductCard(
-                      context,
-                      "assets/images/banner2.jpg",
-                      "Chicken Curry Cut - Small Pieces",
-                      "500 g | 12-18 Pieces | Serves 4",
-                      "₹171",
-                      "₹209",
-                      "18% off",
-                    ),
-                    _buildProductCard(
-                      context,
-                      "assets/images/banner2.jpg",
-                      "Chicken Curry Cut - Big Pieces",
-                      "500 g | 7-11 Pieces | Serves 3",
-                      "₹171",
-                      "₹209",
-                      "18% off",
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.01),
-            // Shop by Category Section
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "Shop by category",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.050,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "Freshest meats and much more!",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.035,
-                  color: AppColors.darkGrey,
-                ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.02),
-            // category grid
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: _buildCategoryGrid(context),
-            ),
-            // Customer Reviews Section
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "Customer Reviews",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.050,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-              child: Text(
-                "What our customers say about us",
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.035,
-                  color: AppColors.darkGrey,
-                ),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.02),
-
-            SizedBox(
-              height: screenHeight * 0.22,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(left: screenWidth * 0.03),
-                itemCount: reviews.length,
-                itemBuilder: (context, index) {
-                  final review = reviews[index];
-                  return Container(
-                    width: screenWidth * 0.7,
-                    margin: EdgeInsets.only(right: screenWidth * 0.04),
-                    child: Stack(
+                SizedBox(height: screenHeight * 0.02),
+                // Bestsellers Section
+                Padding(
+                  padding: EdgeInsets.only(left: screenWidth * 0.03),
+                  child: SizedBox(
+                    height: screenHeight * 0.30,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
                       children: [
-                        // Watermark background
-                        Positioned.fill(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              "assets/images/bgImages/reviewWhatermark.jpg",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                        _buildProductCard(
+                          context,
+                          "assets/images/banner2.jpg",
+                          "Chicken Curry Cut - Small Pieces",
+                          "500 g | 12-18 Pieces | Serves 4",
+                          "₹171",
+                          "₹209",
+                          "18% off",
                         ),
+                        _buildProductCard(
+                          context,
+                          "assets/images/banner2.jpg",
+                          "Chicken Curry Cut - Big Pieces",
+                          "500 g | 7-11 Pieces | Serves 3",
+                          "₹171",
+                          "₹209",
+                          "18% off",
+                        ),
+                        _buildProductCard(
+                          context,
+                          "assets/images/banner2.jpg",
+                          "Chicken Curry Cut - Small Pieces",
+                          "500 g | 12-18 Pieces | Serves 4",
+                          "₹171",
+                          "₹209",
+                          "18% off",
+                        ),
+                        _buildProductCard(
+                          context,
+                          "assets/images/banner2.jpg",
+                          "Chicken Curry Cut - Big Pieces",
+                          "500 g | 7-11 Pieces | Serves 3",
+                          "₹171",
+                          "₹209",
+                          "18% off",
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // SizedBox(height: screenHeight * 0.01),
+                // Shop by Category Section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "Shop by category",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.050,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "Freshest meats and much more!",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.035,
+                      color: AppColors.darkGrey,
+                    ),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.02),
+                // category grid
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: _buildCategoryGrid(context),
+                ),
+                // Customer Reviews Section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "Customer Reviews",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.050,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+                  child: Text(
+                    "What our customers say about us",
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.035,
+                      color: AppColors.darkGrey,
+                    ),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.02),
 
-                        // Review content
-                        Container(
-                          padding: EdgeInsets.all(screenWidth * 0.04),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Customer name + rating
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                SizedBox(
+                  height: screenHeight * 0.22,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.only(left: screenWidth * 0.03),
+                    itemCount: reviews.length,
+                    itemBuilder: (context, index) {
+                      final review = reviews[index];
+                      return Container(
+                        width: screenWidth * 0.7,
+                        margin: EdgeInsets.only(right: screenWidth * 0.04),
+                        child: Stack(
+                          children: [
+                            // Watermark background
+                            Positioned.fill(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.asset(
+                                  "assets/images/bgImages/reviewWhatermark.jpg",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+
+                            // Review content
+                            Container(
+                              padding: EdgeInsets.all(screenWidth * 0.04),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    review["name"],
-                                    style: TextStyle(
-                                      fontSize: screenWidth * 0.04,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
+                                  // Customer name + rating
                                   Row(
-                                    children: List.generate(
-                                      5,
-                                          (star) => Icon(
-                                        Icons.star,
-                                        size: screenWidth * 0.045,
-                                        color: star < review["rating"]
-                                            ? Colors.amber
-                                            : Colors.grey.shade300,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        review["name"],
+                                        style: TextStyle(
+                                          fontSize: screenWidth * 0.04,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.black,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: List.generate(
+                                          5,
+                                              (star) => Icon(
+                                            Icons.star,
+                                            size: screenWidth * 0.045,
+                                            color: star < review["rating"]
+                                                ? Colors.amber
+                                                : Colors.grey.shade300,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: screenHeight * 0.01),
+
+                                  // Comment
+                                  Expanded(
+                                    child: Text(
+                                      review["comment"],
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.035,
+                                        color: AppColors.darkGrey,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: screenHeight * 0.01),
-
-                              // Comment
-                              Expanded(
-                                child: Text(
-                                  review["comment"],
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: screenWidth * 0.035,
-                                    color: AppColors.darkGrey,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.02),
+              ],
             ),
-            SizedBox(height: screenHeight * 0.02),
-          ],
-        ),
+          ),
+          // FloatingCartBar()
+          FloatingCartBarWidget(
+            totalItems: cartController.totalItems,
+            totalPrice: cartController.totalPrice,
+            buttonText: "View cart",
+            onTap: () {
+              Get.toNamed(AppRoutes.cart);
+            },
+          ),
+
+        ],
       ),
     );
   }

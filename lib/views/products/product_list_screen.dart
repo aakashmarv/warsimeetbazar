@@ -1,7 +1,10 @@
+import 'package:dry_fish/viewmodels/cart_controller.dart';
 import 'package:dry_fish/views/products/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
+import 'package:flutter/services.dart';
 
 class ProductListScreen extends StatefulWidget {
   final String category;
@@ -12,6 +15,7 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+
   int selectedIndex = 0;
 
   final List<String> categories = [
@@ -96,7 +100,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(selectedCategory),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        title: Text(selectedCategory,style: TextStyle(
+          fontSize: 19.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.white,
+        ),),
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),

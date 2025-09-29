@@ -1,3 +1,4 @@
+import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -79,7 +80,9 @@ class NewAddressScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.sp),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.orderConfirmer);
+                  },
                   child: Text(
                     "SAVE ADDRESS",
                     style: TextStyle(

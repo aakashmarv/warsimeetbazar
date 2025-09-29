@@ -11,21 +11,23 @@ class AppColors {
   static const Color extraLightestPrimary = Color(0xFFfff0f2);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  static const Color bgColor = Color(0xFFF4F4F4); // softer white
+  // static const Color bgColor = Color(0xFFF4F4F4); // softer white
+  static const Color bgColor = Color(0xFFF8FAFC); // softer white
 
   // Greys
-  static const Color grey = Color(0xFFB3B2B2); // base grey
+  static const Color grey = Color(0xFF9F9F9F); // base grey
   static const Color lightGrey = Color(0xFFD6D6D6);
   static const Color lighterGrey = Color(0xFFEFEFEF);
   static const Color extraLightGrey = Color(0xFFF8F8F8);
   static const Color darkGrey = Color(0xFF616161);
+  static const Color textGrey = Color(0xFF8F8F8F);
   static const Color borderGrey = Color(0xFFDDDDDD);
   static const Color hintTextGrey = Color(0xFFAFAFAF);
   static const Color iconGrey = Color(0xFFB0B0B0);
 
   // Greens
   static const Color lightGreen = Color(0xFFC8E6C9);
-  static const Color successGreen = Color(0xFF2E7D32);
+  static const Color successGreen = Color(0xFF008000);
   static const Color confirmGreen = Color(0xFF43A047);
   static const Color accentGreen = Color(0xFF66BB6A);
   static const Color gold = Color(0xFFFDD017);
