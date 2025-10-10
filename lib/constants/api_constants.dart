@@ -1,11 +1,12 @@
 class ApiConstants {
   // Base URL
-  static const String baseUrl = "https://uxbill.com/api/v1";
-  static const String ImageBaseUrl = "https://uxbill.com/storage/";
+  static const String baseUrl = "https://chavanbrothers.co.in/api";
+  static const String imageBaseUrl = "https://chavanbrothers.co.in/";
 
   // Endpoints
-  static const String loginUrl = "$baseUrl/user/login-or-signup-otp-send";
+  static const String loginUrl = "$baseUrl/user/login";
+  static const String getCategoryUrl = "$baseUrl/user/categories";
 
-  static String updateCategoryUrl(String categoryId) => "$baseUrl/user/category/$categoryId";
+  static String productByCategoryUrl(int categoryId) => "$baseUrl/products/categories/$categoryId";
 
 }

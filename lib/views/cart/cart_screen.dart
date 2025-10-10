@@ -6,9 +6,12 @@ import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../roots/routes.dart';
 import '../../viewmodels/cart_controller.dart';
+import '../../widgets/custom_text_app_bar.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({super.key});
+  final bool showAppBar;
+
+  const CartScreen({super.key, this.showAppBar = true});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -71,7 +74,6 @@ class _CartScreenState extends State<CartScreen> {
     },
   ];
 
-
   void updateQuantity(int index, int change) {
     setState(() {
       cartItems[index]["qty"] += change;
@@ -95,29 +97,33 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-
   int get totalItems {
     return cartItems.fold<int>(0, (sum, item) => sum + (item["qty"] as int));
   }
 
   @override
   Widget build(BuildContext context) {
+    // final statusBarHeight = MediaQuery.of(context).padding.top;
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      appBar: AppBar(
-        elevation: 0,
+      appBar: widget.showAppBar
+          ? AppBar(
+        backgroundColor: AppColors.extraLightestPrimary,
+        elevation: 1,
+        centerTitle: true,
         title: const Text(
           "My Cart",
           style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
           ),
         ),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-      ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      )
+          : const CustomTextAppBar(title: "Cart"),
       body: Stack(
         children: [
           /// Cart List
@@ -125,7 +131,7 @@ class _CartScreenState extends State<CartScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding:  EdgeInsets.only(left: 12,right: 12,top: 12,bottom: 12.h),
                   itemCount: cartItems.length,
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
@@ -325,73 +331,6 @@ class _CartScreenState extends State<CartScreen> {
             ],
           ),
           /// Checkout Bottom
-          // Positioned(
-          //   left: 4.w,right: 4.w,
-          //   bottom: 6.h,
-          //   child: Container(
-          //     padding: EdgeInsets.all(16),
-          //     decoration: BoxDecoration(
-          //       color: AppColors.successGreen,
-          //       borderRadius: BorderRadius.circular(12),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black26,
-          //           blurRadius: 4,
-          //           offset: const Offset(0, 2),
-          //         )
-          //       ],
-          //     ),
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //       children: [
-          //         /// Left: Items & Price
-          //         Row(
-          //           children: [
-          //             Text(
-          //               "$totalItems items |",
-          //               style: const TextStyle(
-          //                 color: Colors.white,
-          //                 fontSize: 15,
-          //                 fontWeight: FontWeight.w500,
-          //               ),
-          //             ),
-          //             const SizedBox(width: 8),
-          //             Text(
-          //               "₹${totalAmount.toStringAsFixed(0)}",
-          //               style: const TextStyle(
-          //                 color: Colors.white,
-          //                 fontSize: 16,
-          //                 fontWeight: FontWeight.bold,
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //
-          //         /// Right: Checkout button
-          //         InkWell(
-          //           onTap: () {
-          //             // Checkout action
-          //           },
-          //           child: Row(
-          //             children: const [
-          //               Text(
-          //                 "Checkout",
-          //                 style: TextStyle(
-          //                   color: Colors.white,
-          //                   fontSize: 16,
-          //                   fontWeight: FontWeight.w600,
-          //                 ),
-          //               ),
-          //               SizedBox(width: 4),
-          //               Icon(Icons.arrow_forward,
-          //                   color: Colors.white, size: 18),
-          //             ],
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
           FloatingCartBarWidget(
             totalItems: cartController.totalItems,
             totalPrice: cartController.totalPrice,

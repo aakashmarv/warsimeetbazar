@@ -40,13 +40,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   Future<void> _initialize() async {
     final prefs = await SharedPreferencesService.getInstance();
-
     bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
-
     await Future.delayed(const Duration(seconds: 3));
-
     if (!isLogged) {
-      Get.offAllNamed(AppRoutes.dashBoard);
+      Get.offAllNamed(AppRoutes.onboarding);
     }  else {
       Get.offAllNamed(AppRoutes.dashBoard);
     }

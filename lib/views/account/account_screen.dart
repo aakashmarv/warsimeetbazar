@@ -1,24 +1,46 @@
+import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../../Constants/app_colors.dart';
+import '../../widgets/custom_text_app_bar.dart';
 
-class AccountScreen extends StatelessWidget {
+
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+Future<void> _launchURL(String url) async {
+  final Uri uri = Uri.parse(url);
+  if (!await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+    webViewConfiguration: const WebViewConfiguration(
+      enableJavaScript: true,
+      enableDomStorage: true,
+    ),
+  )) {
+    throw Exception('Could not launch $url');
+  }
+}
+
+class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: const CustomTextAppBar(title: "Setting"),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+          padding: EdgeInsets.symmetric( vertical: 2.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 4.h),
-
               /// User Info
               Center(
                 child: Column(
@@ -50,6 +72,7 @@ class AccountScreen extends StatelessWidget {
                 icon: Icons.shopping_cart_outlined,
                 title: "Orders",
                 subtitle: "Check your order status",
+                onTap: (){Get.toNamed(AppRoutes.order);}
               ),
               _buildMenuItem(
                 icon: Icons.card_giftcard,
@@ -60,16 +83,23 @@ class AccountScreen extends StatelessWidget {
                 icon: Icons.phone_outlined,
                 title: "Contact Us",
                 subtitle: "Help regarding your recent purchase",
+                  onTap: (){Get.toNamed(AppRoutes.contact);}
               ),
               _buildMenuItem(
                 icon: Icons.description_outlined,
                 title: "Terms & Conditions",
                 subtitle: "",
+                onTap: () {
+                  _launchURL("https://www.termsfeed.com/blog/privacy-policy-url/");
+                },
               ),
               _buildMenuItem(
                 icon: Icons.policy_outlined,
                 title: "Privacy Policy",
                 subtitle: "",
+                onTap: () {
+                  _launchURL("https://www.termsfeed.com/blog/privacy-policy-url/");
+                },
               ),
               _buildMenuItem(
                 icon: Icons.store_outlined,
@@ -90,6 +120,9 @@ class AccountScreen extends StatelessWidget {
                 icon: Icons.logout,
                 title: "Logout",
                 subtitle: "",
+                onTap: () {
+                  _showLogoutDialog(context);
+                },
               ),
 
               SizedBox(height: 5.h),
@@ -150,17 +183,60 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text(
+            "Logout",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            "Are you sure you want to logout?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cancel, just close dialog
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cancel, just close dialog
+              },
+              child: const Text(
+                "Logout",
+                style: TextStyle(color: AppColors.primary),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
     required String subtitle,
     String? trailing,
+    VoidCallback? onTap,
   }) {
     return Column(
       children: [
         ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: Icon(icon, color: AppColors.primary, size: 20.sp),
+          leading: Padding(
+            padding:  EdgeInsets.only(left: 5.w),child: Icon(icon, color: AppColors.primary, size: 20.sp),),
           title: Text(
             title,
             style: TextStyle(
@@ -193,8 +269,11 @@ class AccountScreen extends StatelessWidget {
               ),
             ],
           )
-              : Icon(Icons.chevron_right, color: AppColors.darkGrey, size: 18.sp),
-          onTap: () {},
+              : Padding(
+            padding:  EdgeInsets.only(right: 5.w),
+            child: Icon(Icons.chevron_right, color: AppColors.darkGrey, size: 18.sp),
+          ),
+          onTap: onTap,
         ),
         Divider(height: 1.h, thickness: 0.3,color: AppColors.grey,),
       ],

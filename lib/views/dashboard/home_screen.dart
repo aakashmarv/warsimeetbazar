@@ -1,11 +1,15 @@
-import 'dart:math';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../Constants/app_colors.dart';
+import '../../constants/api_constants.dart';
 import '../../roots/routes.dart';
 import '../../viewmodels/cart_controller.dart';
+import '../../viewmodels/category_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
+import '../products/product_detail_screen.dart';
 import '../products/product_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +20,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final CartController cartController = Get.put(CartController());
+  final CartController cartController = Get.find<CartController>();
+  final CategoryController categoryController = Get.put(CategoryController());
   final List<Map<String, dynamic>> reviews = [
     {
       "name": "Amit Sharma",
@@ -39,7 +44,18 @@ class _HomeScreenState extends State<HomeScreen> {
       "comment": "Great variety, definitely ordering again!"
     },
   ];
+  final List<String> carouselItems = [
+    "assets/images/banner2.jpg",
+    "assets/images/banner2.jpg",
+    "assets/images/banner2.jpg",
+  ];
+  int _carouselIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    categoryController.getCategory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,14 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: screenHeight * 0.01),
-                // Banner (Smooth Carousel)
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-                  child: SizedBox(
-                    height: screenHeight * 0.20,
-                    width: double.infinity,
-                    child: _buildBanner(context, "assets/images/banner2.jpg"),
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+                  child: buildCarouselSlider(),
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
@@ -137,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                // SizedBox(height: screenHeight * 0.01),
                 // Shop by Category Section
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
@@ -291,6 +301,55 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  Widget buildCarouselSlider() {
+    return Column(
+      children: [
+        CarouselSlider(
+          items: carouselItems.map((item) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                item,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            );
+          }).toList(),
+          options: CarouselOptions(
+            height: 180,
+            autoPlay: true,
+            enlargeCenterPage: true,
+            aspectRatio: 10 / 9,
+            viewportFraction: 0.95,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _carouselIndex = index;
+              });
+            },
+          ),
+        ),
+
+        /// Modern Indicator
+        SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            carouselItems.length,
+                (index) => AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              margin: EdgeInsets.symmetric(horizontal: 4),
+              height: 8,
+              width: _carouselIndex == index ? 20 : 8,
+              decoration: BoxDecoration(
+                color: _carouselIndex == index ? AppColors.primary  : AppColors.lightGrey,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   // ---------------- Banner widget ----------------
   Widget _buildBanner(BuildContext context, String assetPath) {
@@ -319,89 +378,98 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Container(
-      width: screenWidth * 0.58,
-      margin: EdgeInsets.only(right: screenWidth * 0.04),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12)
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        Get.to(ProductDetailScreen(
+          productName: title,
+          imageUrl: imageUrl,
+        ));
+      },
+      child: Container(
+        width: screenWidth * 0.58,
+        margin: EdgeInsets.only(right: screenWidth * 0.04),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+      
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12)
+              ),
+              child: Image.asset(
+                imageUrl, // pass the asset path here
+                height: screenHeight * 0.16,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Image.asset(
-              imageUrl, // pass the asset path here
-              height: screenHeight * 0.16,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-
-          Padding(
-            padding: EdgeInsets.all(screenWidth * 0.025),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.nunito(
-                    fontSize: screenWidth * 0.039,
-                    fontWeight: FontWeight.w700,
+      
+      
+            Padding(
+              padding: EdgeInsets.all(screenWidth * 0.025),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.039,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                SizedBox(height: screenHeight * 0.005),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.nunito(
-                    fontSize: screenWidth * 0.028,
-                    color: AppColors.darkGrey,
+                  SizedBox(height: screenHeight * 0.005),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.028,
+                      color: AppColors.darkGrey,
+                    ),
                   ),
-                ),
-                SizedBox(height: screenHeight * 0.008),
-                Row(
-                  children: [
-                    Text(
-                      price,
-                      style: GoogleFonts.nunito(
-                        fontSize: screenWidth * 0.035,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(height: screenHeight * 0.008),
+                  Row(
+                    children: [
+                      Text(
+                        price,
+                        style: GoogleFonts.nunito(
+                          fontSize: screenWidth * 0.035,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      oldPrice,
-                      style: GoogleFonts.nunito(
-                        fontSize: screenWidth * 0.030,
-                        decoration: TextDecoration.lineThrough,
-                        color: Colors.grey,
+                      SizedBox(width: 6),
+                      Text(
+                        oldPrice,
+                        style: GoogleFonts.nunito(
+                          fontSize: screenWidth * 0.030,
+                          decoration: TextDecoration.lineThrough,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      discount,
-                      style: GoogleFonts.nunito(
-                        fontSize: screenWidth * 0.030,
-                        color: Colors.green,
-                        fontWeight: FontWeight.w600,
+                      SizedBox(width: 6),
+                      Text(
+                        discount,
+                        style: GoogleFonts.nunito(
+                          fontSize: screenWidth * 0.030,
+                          color: Colors.green,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -411,79 +479,112 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final List<Map<String, String>> categories = [
-      // Fresh Fish
-      {"title": "Pomfret"},
-      {"title": "Bombil"},
-      {"title": "Mackerel"},
-      {"title": "Prawns & Crabs"},
-      {"title": "Seawater Fish"},
-      {"title": "Freshwater Fish"},
-      {"title": "Combos"},
-
-      // Dry Fish
-      {"title": "Sukat"},
-      {"title": "Bombil"},
-      {"title": "Tisrya"},
-      {"title": "Mandeli"},
-      {"title": "Tingli"},
-      {"title": "Ribbon"},
-      {"title": "Dandi"},
-      {"title": "Crabs"},
-      {"title": "Pickles"},
-    ];
-
-
-    final Random random = Random(); // for random selection
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      itemCount: categories.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: screenWidth * 0.02,
-        mainAxisSpacing: screenHeight * 0.015,
-        childAspectRatio: 0.75,
-      ),
-      itemBuilder: (context, index) {
-        // Randomly pick p2.png or p3.png for each item
-        String randomImage = random.nextBool()
-            ? "assets/images/p2.png"
-            : "assets/images/p2.png";
-
-        return InkWell(
-          onTap: () {
-            Get.to(() => ProductListScreen(
-              category: categories[index]["title"]!,
-            ));
+    return Obx(() {
+      if (categoryController.isLoading.value) {
+        // Shimmer effect
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: 8, // number of shimmer items
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: screenWidth * 0.02,
+            mainAxisSpacing: screenHeight * 0.015,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            return Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: screenWidth * 0.18,
+                    width: screenWidth * 0.18,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.008),
+                  Container(
+                    height: screenHeight * 0.02,
+                    width: screenWidth * 0.18,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            );
           },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  randomImage,
-                  height: screenWidth * 0.18,
-                  width: screenWidth * 0.18,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.008),
-              Text(
-                categories[index]["title"]!,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.nunito(
-                  fontSize: screenWidth * 0.030,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                ),
-              ),
-            ],
+        );
+      } else if (categoryController.categoryList.isEmpty) {
+        return Center(
+          child: Text(
+            "No categories found",
+            style: TextStyle(fontSize: screenWidth * 0.035),
           ),
         );
-      },
-    );
+      } else {
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: categoryController.categoryList.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: screenWidth * 0.02,
+            mainAxisSpacing: screenHeight * 0.015,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            final category = categoryController.categoryList[index];
+            String imageUrl = category.image != null
+                ? "${ApiConstants.imageBaseUrl}/${category.image}"
+                : "assets/images/p2.png";
+
+            return InkWell(
+              onTap: () {
+                if (category.id != null) {
+                  Get.to(() => ProductListScreen(category: category.id));
+                } else {
+                  Get.snackbar("Error", "Invalid category ID");
+                }
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipOval(
+                    child: Image.network(
+                      imageUrl,
+                      height: screenWidth * 0.18,
+                      width: screenWidth * 0.18,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Image.asset("assets/images/p2.png",
+                              height: screenWidth * 0.18,
+                              width: screenWidth * 0.18,
+                              fit: BoxFit.cover),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.008),
+                  Text(
+                    category.name ?? "",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.nunito(
+                      fontSize: screenWidth * 0.030,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }
+    });
   }
+
 }

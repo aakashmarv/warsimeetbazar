@@ -1,3 +1,4 @@
+import 'package:dry_fish/Constants/app_colors.dart';
 import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,18 +11,18 @@ class NewAddressScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          "New Address",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        backgroundColor: AppColors.extraLightestPrimary,
+        elevation: 1,
         centerTitle: true,
+        title: const Text(
+          "Add Address",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        // systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
@@ -81,7 +82,7 @@ class NewAddressScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Get.toNamed(AppRoutes.orderConfirmer);
+
                   },
                   child: Text(
                     "SAVE ADDRESS",

@@ -110,7 +110,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   pinned: true,
                   elevation: 0,
                   backgroundColor: _isCollapsed
-                      ? AppColors.primary
+                      ? AppColors.extraLightestPrimary
                       : Colors.transparent,
                   centerTitle: true,
                   title: AnimatedSwitcher(
@@ -133,13 +133,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       key: const ValueKey("title"),
                       style: TextStyle(
                         fontSize: 19.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.white,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                     )
                         : const SizedBox.shrink(
-                      key: ValueKey("empty"), // Expanded में title empty रहेगा
+                      key: ValueKey("empty"),
                     ),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
@@ -180,7 +180,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     child: IconButton(
                       icon: Icon(
                         Icons.arrow_back_rounded,
-                        color: _isCollapsed ? AppColors.white : AppColors.white,
+                        color: _isCollapsed ? AppColors.black : AppColors.white,
                         size: 24,
                       ),
                       onPressed: () => Navigator.pop(context),

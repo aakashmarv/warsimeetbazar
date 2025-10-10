@@ -1,5 +1,6 @@
 // import 'package:device_preview/device_preview.dart';
 import 'package:dry_fish/roots/routes.dart';
+import 'package:dry_fish/services/api_service.dart';
 import 'package:dry_fish/services/sharedpreferences_service.dart';
 import 'package:dry_fish/utils/thems/app_theme.dart';
 import 'package:dry_fish/viewmodels/app_state_controller.dart';
@@ -10,6 +11,10 @@ import 'constants/app_strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize ApiService before any API call
+  await ApiService.init(); // ✅ add this line
+
+  // Initialize app state controller
   final prefs = await SharedPreferencesService.getInstance();
   final appStateController = AppStateController(prefs);
   await appStateController.initialize();

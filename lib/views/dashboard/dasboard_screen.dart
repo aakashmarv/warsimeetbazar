@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../Constants/app_colors.dart';
+import '../../viewmodels/cart_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,13 +22,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final DashboardController controller = Get.put(DashboardController());
+  final CartController cartController = Get.put(CartController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _screens = [
     const HomeScreen(),
     SearchScreen(),
-    Center(child: Text("Categories")),
-    CartScreen(),
+    const CartScreen(showAppBar: false),
     AccountScreen(),
   ];
 
@@ -238,7 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             unselectedFontSize: 12,
             iconSize: 24,
             onTap: controller.selectedIndex,
-            items: const [
+            items:  [
               BottomNavigationBarItem(
                 icon: Icon(LucideIcons.house),
                 label: "Home",
@@ -248,11 +249,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 label: "Search",
               ),
               BottomNavigationBarItem(
-                icon: Icon(LucideIcons.layers2),
-                label: "Categories",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(LucideIcons.shoppingBag),
+                icon: Obx(() {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(LucideIcons.shoppingBag),
+                      if (cartController.totalItems.value > 0)
+                        Positioned(
+                          right: -6,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              "${cartController.totalItems.value}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
                 label: "Cart",
               ),
               BottomNavigationBarItem(

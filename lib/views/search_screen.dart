@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Constants/app_colors.dart';
+import '../widgets/custom_text_app_bar.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -75,6 +76,7 @@ class _SearchScreenState extends State<SearchScreen>
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: const CustomTextAppBar(title: "Search"),
       body: SafeArea(
         child: FadeTransition(
           opacity: _animation,
@@ -147,7 +149,7 @@ class _SearchScreenState extends State<SearchScreen>
 
                         return InkWell(
                           onTap: () {
-                            Get.to(() => ProductListScreen(category: title));
+                            // Get.to(() => ProductListScreen(category: title));
                           },
                           child:
                           Column(
