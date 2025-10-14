@@ -1,14 +1,14 @@
-import 'package:dry_fish/viewmodels/cart_controller.dart';
+import 'package:dry_fish/views/products/controller/cart_controller.dart';
 import 'package:dry_fish/views/products/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/api_constants.dart';
 import '../../viewmodels/category_controller.dart';
-import '../../viewmodels/product_list_controller.dart';
+import '../../viewmodels/products_by_category_controller.dart';
 
 // class ProductListScreen extends StatefulWidget {
 //   final String category;
@@ -264,27 +264,34 @@ import '../../viewmodels/product_list_controller.dart';
 // }
 
 class ProductListScreen extends StatefulWidget {
-  final int? category; // make nullable, since id is int?
-  const ProductListScreen({Key? key, this.category}) : super(key: key);
+  const ProductListScreen({Key? key}) : super(key: key);
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  final ProductListController controller = Get.put(ProductListController());
+  late final int categoryId;
   final CategoryController categoryController = Get.find<CategoryController>();
+  final ProductsByCategoryController productsByCategoryController = Get.put(ProductsByCategoryController());
 
   @override
   void initState() {
     super.initState();
-
-    /// 1️⃣ Fetch all categories
-    categoryController.getCategory().then((_) {
-      /// 2️⃣ After fetching, set selected category
-      if (widget.category != null &&
-          categoryController.categoryList.isNotEmpty) {
-        controller.setInitialCategory(widget.category! as String);
+    // Initialize categoryId from Get.arguments safely
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args == null || args['categoryId'] == null) {
+      categoryId = 0;
+    } else {
+      categoryId = args['categoryId'];
+    }
+    print("categoryId :: ${categoryId}");
+    ///  Fetch all categories
+    categoryController.getCategory();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ///  After fetching, set selected category
+      if (categoryController.categoryList.isNotEmpty) {
+        productsByCategoryController.setInitialCategory(categoryId);
       }
     });
   }
@@ -303,7 +310,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         title: Obx(() {
           if (categoryController.categoryList.isEmpty) return const Text("");
           final cat = categoryController
-              .categoryList[controller.selectedCategoryIndex.value];
+              .categoryList[productsByCategoryController.selectedCategoryIndex.value];
           return Text(
             cat.name ?? "",
             style:
@@ -312,7 +319,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         }),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Row(
@@ -330,10 +337,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 itemCount: categoryController.categoryList.length,
                 itemBuilder: (context, index) {
                   final isSelected =
-                      controller.selectedCategoryIndex.value == index;
+                      productsByCategoryController.selectedCategoryIndex.value == index;
                   final cat = categoryController.categoryList[index];
                   return InkWell(
-                    onTap: () => controller.selectCategory(index),
+                    onTap: () => productsByCategoryController.selectCategory(index),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 8),
@@ -387,15 +394,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
           /// 🟦 Right Product Grid
           Expanded(
             child: Obx(() {
-              if (controller.isLoadingProducts.value) {
+              if (productsByCategoryController.isLoadingProducts.value) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (controller.products.isEmpty) {
+              if (productsByCategoryController.products.isEmpty) {
                 return const Center(child: Text("No products found"));
               }
 
-              final products = controller.products;
+              final products = productsByCategoryController.products;
               return GridView.builder(
                 padding: EdgeInsets.all(screenWidth * 0.02),
                 itemCount: products.length,
@@ -410,7 +417,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     onTap: () {
                       Get.to(() => ProductDetailScreen(
                         productName: product.name ?? "",
-                        imageUrl: product.image ?? "",
+                        imageUrl: "${ApiConstants.imageBaseUrl}${product.image ?? ""}",
                       ));
                     },
                     child: Container(
@@ -420,23 +427,36 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: product.image != null
-                                ? Image.network(
-                              "${ApiConstants.imageBaseUrl}/${product.image}",
-                              height: screenHeight * 0.14,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              "assets/images/banner2.jpg",
-                              height: screenHeight * 0.14,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                      ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: product.image != null
+                          ? CachedNetworkImage(
+                        imageUrl: "${ApiConstants.imageBaseUrl}/${product.image}",
+                        height: screenHeight * 0.14,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
-                          Expanded(
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          "assets/images/banner2.jpg",
+                          height: screenHeight * 0.14,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : Image.asset(
+                        "assets/images/banner2.jpg",
+                        height: screenHeight * 0.14,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                      Expanded(
                             child: Padding(
                               padding: EdgeInsets.all(screenWidth * 0.025),
                               child: Column(
@@ -487,5 +507,3 @@ class _ProductListScreenState extends State<ProductListScreen> {
     );
   }
 }
-
-

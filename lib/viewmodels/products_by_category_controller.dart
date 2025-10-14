@@ -1,23 +1,22 @@
-import 'package:dry_fish/repositories/products_repository.dart';
+import 'package:dry_fish/repositories/products_by_category_repository.dart';
 import 'package:get/get.dart';
-import '../models/responses/category_response.dart';
-import '../models/responses/products_response.dart' hide Category;
-import '../repositories/category_repository.dart';
+import '../models/responses/products_by_category_response.dart' hide Category;
 import 'category_controller.dart';
 
-class ProductListController extends GetxController {
-  final ProductsRepository _productRepo = ProductsRepository();
+class ProductsByCategoryController extends GetxController {
+  final ProductsByCategoryRepository _productsByCategoryRepository = ProductsByCategoryRepository();
+  final CategoryController categoryController = Get.find<CategoryController>();
 
   var selectedCategoryIndex = 0.obs;
   var products = <Product>[].obs;
   var isLoadingProducts = false.obs;
 
-  CategoryController categoryController = Get.find<CategoryController>();
+
 
   @override
   void onInit() {
     super.onInit();
-    // wait until categories are loaded to set initial selection
+    // When categories are loaded, fetch products for selected category
     ever(categoryController.categoryList, (_) {
       if (categoryController.categoryList.isNotEmpty) {
         fetchProductsForSelectedCategory();
@@ -25,9 +24,8 @@ class ProductListController extends GetxController {
     });
   }
 
-  void setInitialCategory(String categoryName) {
-    final index = categoryController.categoryList
-        .indexWhere((c) => c.name == categoryName);
+  void setInitialCategory(int categoryId) {
+    final index = categoryController.categoryList.indexWhere((c) => c.id == categoryId);
     if (index != -1) selectedCategoryIndex.value = index;
     fetchProductsForSelectedCategory();
   }
@@ -45,7 +43,7 @@ class ProductListController extends GetxController {
       final selectedCategory =
       categoryController.categoryList[selectedCategoryIndex.value];
       final response =
-      await _productRepo.product(selectedCategory.id!); // API call
+      await _productsByCategoryRepository.productByCategory(selectedCategory.id!);
       if (response.success == true && response.products != null) {
         products.value = response.products!;
       } else {
@@ -59,4 +57,8 @@ class ProductListController extends GetxController {
     }
   }
 }
+
+
+
+
 

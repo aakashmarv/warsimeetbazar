@@ -1,15 +1,14 @@
 import 'package:dry_fish/models/responses/products_by_category_response.dart';
-import 'package:dry_fish/models/responses/products_response.dart';
 import '../constants/api_constants.dart';
 import '../services/api_service.dart';
 
-class ProductsRepository {
+class ProductsByCategoryRepository {
   final _dio = ApiService.dio;
 
-  Future<ProductsResponse> product() async {
+  Future<ProductsByCategoryResponse> productByCategory(int categoryId) async {
     final response = await _dio.get(
-      ApiConstants.productsUrl(),
+      ApiConstants.productByCategoryUrl(categoryId),
     );
-    return ProductsResponse.fromJson(response.data);
+    return ProductsByCategoryResponse.fromJson(response.data);
   }
 }

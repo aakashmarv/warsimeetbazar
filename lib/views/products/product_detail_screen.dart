@@ -4,8 +4,9 @@ import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
 import '../../roots/routes.dart';
-import '../../viewmodels/cart_controller.dart';
+import 'controller/cart_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productName;
@@ -29,35 +30,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
+  final RxInt selectedCutIndex = (-1).obs;
+  final RxInt selectedWeightIndex = (-1).obs;
+  final RxDouble selectedPrice = 0.0.obs;
+
   final List<Map<String, dynamic>> cuts = [
-    {
-      "name": "Curry Cut",
-      "price": 450,
-      "image": "assets/images/banner2.jpg",
-      "description": "Freshly cut curry fish, ideal for home cooking.",
-      "netWeight": "450g • 3-5 pcs",
-      "mrp": 500,
-      "discount": "10%",
-    },
-    {
-      "name": "Fillet",
-      "price": 600,
-      "image": "assets/images/banner2.jpg",
-      "description": "Premium fillet cut, ready to cook.",
-      "netWeight": "500g • 2-3 pcs",
-      "mrp": 750,
-      "discount": "20%",
-    },
-    {
-      "name": "Whole",
-      "price": 350,
-      "image": "assets/images/banner2.jpg",
-      "description": "Whole fish, fresh and cleaned.",
-      "netWeight": "1kg • 1 pc",
-      "mrp": 400,
-      "discount": "15%",
-    },
+    {"name": "Fry Cut", "price": 450, "image": "assets/images/banner2.jpg", "mrp": 500},
+    {"name": "Curry Cut", "price": 600, "image": "assets/images/banner2.jpg", "mrp": 750},
   ];
+  final List<String> weights = [
+    "0.25 kg", "0.5 kg", "1 kg", "1.5 kg", "2 kg", "2.5 kg",
+  ];
+  bool _isCollapsed = false;
+
 
   @override
   void initState() {
@@ -77,14 +62,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     _animationController.dispose();
     super.dispose();
   }
+  void _updateCartTotal() {
+    if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
+      final cut = cuts[selectedCutIndex.value];
+      final basePrice = cut["price"].toDouble();
 
-  bool _isCollapsed = false;
+      // Extract weight value (e.g. "1 kg" → 1.0)
+      final selectedWeightText = weights[selectedWeightIndex.value];
+      final double weight = double.parse(selectedWeightText.split(" ")[0]);
+
+      final double total = basePrice * weight;
+
+      cartController.totalItems.value = 1;
+      cartController.totalPrice.value = total;
+    } else {
+      cartController.totalItems.value = 0;
+      cartController.totalPrice.value = 0.0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: Stack(
@@ -153,7 +153,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                               bottomLeft: Radius.circular(18),
                               bottomRight: Radius.circular(18),
                             ),
-                            child: Image.asset(widget.imageUrl, fit: BoxFit.cover),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                "assets/images/banner2.jpg",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                         ),
                         Container(
@@ -186,20 +199,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  actions: _isCollapsed
-                      ? []
-                      : [
-                    Padding(
-                      padding: EdgeInsets.only(right: 4.w),
-                      child: _buildModernIconButton(
-                        icon: isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : Colors.grey[700]!,
-                        onTap: () {
-                          setState(() => isFavorite = !isFavorite);
-                        },
-                      ),
-                    ),
-                  ],
+                  // actions: _isCollapsed
+                  //     ? []
+                  //     : [
+                  //   Padding(
+                  //     padding: EdgeInsets.only(right: 4.w),
+                  //     child: _buildModernIconButton(
+                  //       icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                  //       color: isFavorite ? Colors.red : Colors.grey[700]!,
+                  //       onTap: () {
+                  //         setState(() => isFavorite = !isFavorite);
+                  //       },
+                  //     ),
+                  //   ),
+                  // ],
                 ),
                 /// Product Info Section
                 SliverToBoxAdapter(
@@ -218,6 +231,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
                           /// Modern Cut Selection
                           _buildCutSelection(screenHeight, screenWidth),
+                          SizedBox(height: 6.w),
+
+                          _buildWeightSelection(),
                           const SizedBox(height: 32),
 
                           /// Enhanced Description
@@ -236,15 +252,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
           ),
           // FloatingCartBar(),
-          FloatingCartBarWidget(
-            totalItems: cartController.totalItems,
-            totalPrice: cartController.totalPrice,
-            buttonText: "View cart",
-            onTap: () {
-              Get.toNamed(AppRoutes.cart);
-            },
-          ),
-
+          Obx(() {
+            if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
+              return FloatingCartBarWidget(
+                totalItems: cartController.totalItems,
+                totalPrice: cartController.totalPrice,
+                buttonText: "View cart",
+                onTap: () => Get.toNamed(AppRoutes.cart),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          }),
         ]
       ),
     );
@@ -263,6 +282,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             height: 1.2,
           ),
         ),
+        SizedBox(height: 1.w),
         Text(
           "(Pungus/Keluthi Meen/Assam Vala/Banka  Jella/Sheelan)",
           style: TextStyle(
@@ -294,68 +314,55 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ),
         const SizedBox(height: 20),
         SizedBox(
-          height: 27.h,
+          height: 22.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: cuts.length,
             itemBuilder: (context, index) {
               final cut = cuts[index];
-              int cutQty = cut["qty"] ?? 0;
 
-              return StatefulBuilder(
-                builder: (context, setStateCard) {
-                  return Container(
+              return Obx(() {
+                bool isSelected = selectedCutIndex.value == index;
+
+                return GestureDetector(
+                  onTap: () {
+                    if (selectedCutIndex.value == index) {
+                      selectedCutIndex.value = -1;
+                      selectedPrice.value = 0.0;
+                    } else {
+                      selectedCutIndex.value = index;
+                      selectedPrice.value = cut["price"].toDouble();
+                    }
+                    _updateCartTotal();
+                  },
+                  child: Container(
                     width: 35.w,
                     margin: EdgeInsets.only(right: 4.w),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: isSelected
+                          ? AppColors.white
+                          : AppColors.lightGrey.withOpacity(0.4),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        width: 1.5,
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         /// Image with overlay
-                        Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(18),
-                                // bottom: Radius.circular(18),
-                              ),
-                              child: Image.asset(
-                                cut["image"],
-                                height: screenHeight * 0.12,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            if (cut["discount"] != null)
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accentGreen.withOpacity(
-                                      0.6,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    cut["discount"],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(18),
+                          ),
+                          child: Image.asset(
+                            cut["image"],
+                            height: screenHeight * 0.12,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
 
                         /// Content
@@ -371,14 +378,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16.sp,
                                     color: Color(0xFF1E293B),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  cut["netWeight"],
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
-                                    color: Colors.grey[600],
                                   ),
                                 ),
                                 SizedBox(height: 1.h),
@@ -401,26 +400,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           color: Colors.grey[500],
-                                          decoration:
-                                              TextDecoration.lineThrough,
+                                          decoration: TextDecoration.lineThrough,
                                         ),
                                       ),
                                   ],
                                 ),
-
-                                const Spacer(),
-
-                                /// Modern Add Button
-                                _buildModernAddButton(cut, setStateCard),
                               ],
                             ),
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
-              );
+                  ),
+                );
+              });
             },
           ),
         ),
@@ -428,86 +421,69 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget _buildModernAddButton(
-    Map<String, dynamic> cut,
-    StateSetter setStateCard,
-  ) {
-    int cutQty = cut["qty"] ?? 0;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: double.infinity,
-      height: 4.h,
-      child: cutQty == 0
-          ? ElevatedButton(
-              onPressed: () {
-                setStateCard(() => cut["qty"] = 1);
-                Get.find<CartController>().addItem(1, cut["price"].toDouble());
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.add, size: 18),
-                  SizedBox(width: 4),
-                  Text("Add", style: TextStyle(fontWeight: FontWeight.w600)),
-                ],
-              ),
-            )
-          : Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primary),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove, color: AppColors.black),
-                    onPressed: () {
-                      setStateCard(() {
-                        if (cut["qty"] > 1) {
-                          cut["qty"]--;
-                          Get.find<CartController>().removeItem(1, cut["price"].toDouble());
-                        } else {
-                          cut["qty"] = 0;
-                          Get.find<CartController>().clearCart();
-                        }
-                      });
-                    },
-                  ),
-                  Text(
-                    cut["qty"].toString(),
-                    style: TextStyle(
-                      fontSize: 4.w,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkGrey,
+  Widget _buildWeightSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Weight",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17.sp,
+            color: AppColors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Select your preferred weight",
+          style: TextStyle(fontSize: 15.sp, color: AppColors.textGrey),
+        ),
+        const SizedBox(height: 20),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: List.generate(weights.length, (index) {
+            return Obx(() {  // <-- Obx per item
+              bool isSelected = selectedWeightIndex.value == index;
+              return GestureDetector(
+                onTap: () {
+                  if (selectedWeightIndex.value == index) {
+                    selectedWeightIndex.value = -1;
+                  } else {
+                    selectedWeightIndex.value = index;
+                  }
+                  _updateCartTotal();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.white
+                        : AppColors.lightGrey.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.lighterPrimary,
+                      width: isSelected ? 1.5 : 0.5,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.add, color: AppColors.black),
-                    onPressed: () {
-                      setStateCard(() => cut["qty"]++);
-                      Get.find<CartController>()
-                          .addItem(1, cut["price"].toDouble());
-                    },
+                  child: Text(
+                    weights[index],
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      color: isSelected ? AppColors.primary : AppColors.black,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            });
+          }),
+        ),
+
+      ],
     );
   }
-
+}
   Widget _buildDescriptionSection() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -675,30 +651,3 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget _buildModernIconButton({
-    required IconData icon,
-    Color color = Colors.black,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 44,
-        width: 44,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.6),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 0,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(icon, color: color, size: 20),
-      ),
-    );
-  }
-}

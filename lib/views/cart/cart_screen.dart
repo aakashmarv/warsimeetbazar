@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../roots/routes.dart';
-import '../../viewmodels/cart_controller.dart';
+import '../products/controller/cart_controller.dart';
 import '../../widgets/custom_text_app_bar.dart';
 
 class CartScreen extends StatefulWidget {

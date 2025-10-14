@@ -11,9 +11,6 @@ import 'constants/app_strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize ApiService before any API call
-  await ApiService.init(); // ✅ add this line
-
   // Initialize app state controller
   final prefs = await SharedPreferencesService.getInstance();
   final appStateController = AppStateController(prefs);

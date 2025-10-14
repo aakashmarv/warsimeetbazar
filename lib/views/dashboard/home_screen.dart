@@ -6,8 +6,9 @@ import 'package:shimmer/shimmer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
 import '../../roots/routes.dart';
-import '../../viewmodels/cart_controller.dart';
+import '../products/controller/cart_controller.dart';
 import '../../viewmodels/category_controller.dart';
+import '../../viewmodels/products_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
 import '../products/product_detail_screen.dart';
 import '../products/product_list_screen.dart';
@@ -22,6 +23,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final CartController cartController = Get.find<CartController>();
   final CategoryController categoryController = Get.put(CategoryController());
+  final ProductsController productsController = Get.put(ProductsController());
+
   final List<Map<String, dynamic>> reviews = [
     {
       "name": "Amit Sharma",
@@ -49,11 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
     "assets/images/banner2.jpg",
     "assets/images/banner2.jpg",
   ];
-  int _carouselIndex = 0;
+  final RxInt carouselIndex = 0.obs;
 
   @override
   void initState() {
     super.initState();
+    productsController.getProducts();
     categoryController.getCategory();
   }
 
@@ -103,50 +107,71 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Bestsellers Section
                 Padding(
                   padding: EdgeInsets.only(left: screenWidth * 0.03),
-                  child: SizedBox(
-                    height: screenHeight * 0.30,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _buildProductCard(
-                          context,
-                          "assets/images/banner2.jpg",
-                          "Chicken Curry Cut - Small Pieces",
-                          "500 g | 12-18 Pieces | Serves 4",
-                          "₹171",
-                          "₹209",
-                          "18% off",
+                  child: Obx(() {
+                    if (productsController.isLoading.value) {
+                      // shimmer-like placeholders while loading
+                      return SizedBox(
+                        height: screenHeight * 0.30,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 4,
+                          itemBuilder: (_, __) => Container(
+                            width: screenWidth * 0.58,
+                            margin: EdgeInsets.only(right: screenWidth * 0.04),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
-                        _buildProductCard(
-                          context,
-                          "assets/images/banner2.jpg",
-                          "Chicken Curry Cut - Big Pieces",
-                          "500 g | 7-11 Pieces | Serves 3",
-                          "₹171",
-                          "₹209",
-                          "18% off",
+                      );
+                    }
+
+                    if (productsController.productList.isEmpty) {
+                      return SizedBox(
+                        height: screenHeight * 0.1,
+                        child: Center(
+                          child: Text(
+                            "No bestsellers found",
+                            style: GoogleFonts.nunito(
+                              color: AppColors.darkGrey,
+                              fontSize: screenWidth * 0.035,
+                            ),
+                          ),
                         ),
-                        _buildProductCard(
-                          context,
-                          "assets/images/banner2.jpg",
-                          "Chicken Curry Cut - Small Pieces",
-                          "500 g | 12-18 Pieces | Serves 4",
-                          "₹171",
-                          "₹209",
-                          "18% off",
-                        ),
-                        _buildProductCard(
-                          context,
-                          "assets/images/banner2.jpg",
-                          "Chicken Curry Cut - Big Pieces",
-                          "500 g | 7-11 Pieces | Serves 3",
-                          "₹171",
-                          "₹209",
-                          "18% off",
-                        ),
-                      ],
-                    ),
-                  ),
+                      );
+                    }
+
+                    final products = productsController.productList;
+
+                    return SizedBox(
+                      height: screenHeight * 0.30,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: products.length,
+                        itemBuilder: (context, index) {
+                          final product = products[index];
+                          final imageUrl = product.image != null
+                              ? "${ApiConstants.imageBaseUrl}${product.image}"
+                              : "assets/images/banner2.jpg";
+                          print("image :: $imageUrl");
+                          final price = "₹${product.price ?? '0'}";
+                          final title = product.name ?? "";
+                          final description = product.description ?? "";
+
+                          return _buildProductCard(
+                            context,
+                            imageUrl,
+                            title,
+                            description,
+                            price,
+                            "", // optional old price placeholder
+                            "", // optional discount placeholder
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ),
                 // Shop by Category Section
                 Padding(
@@ -322,46 +347,33 @@ class _HomeScreenState extends State<HomeScreen> {
             aspectRatio: 10 / 9,
             viewportFraction: 0.95,
             onPageChanged: (index, reason) {
-              setState(() {
-                _carouselIndex = index;
-              });
+              carouselIndex.value = index;
             },
           ),
         ),
 
         /// Modern Indicator
         SizedBox(height: 8),
-        Row(
+        Obx(() => Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
             carouselItems.length,
                 (index) => AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 4),
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               height: 8,
-              width: _carouselIndex == index ? 20 : 8,
+              width: carouselIndex.value == index ? 20 : 8,
               decoration: BoxDecoration(
-                color: _carouselIndex == index ? AppColors.primary  : AppColors.lightGrey,
+                color: carouselIndex.value == index
+                    ? AppColors.primary
+                    : AppColors.lightGrey,
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
-        ),
+        ))
+
       ],
-    );
-  }
-
-  // ---------------- Banner widget ----------------
-  Widget _buildBanner(BuildContext context, String assetPath) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.asset(
-        assetPath,
-        fit: BoxFit.cover,
-        width: screenWidth,
-      ),
     );
   }
 
@@ -398,21 +410,25 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Image
             ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12)
-              ),
-              child: Image.asset(
-                imageUrl, // pass the asset path here
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                imageUrl,
                 height: screenHeight * 0.16,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "assets/images/banner2.jpg",
+                    height: screenHeight * 0.16,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
-      
-      
+
+
+
             Padding(
               padding: EdgeInsets.all(screenWidth * 0.025),
               child: Column(
@@ -547,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return InkWell(
               onTap: () {
                 if (category.id != null) {
-                  Get.to(() => ProductListScreen(category: category.id));
+                  Get.toNamed(AppRoutes.productScreen,arguments: {'categoryId': category.id});
                 } else {
                   Get.snackbar("Error", "Invalid category ID");
                 }

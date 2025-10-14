@@ -1,39 +1,41 @@
 class ProductsResponse {
-  bool? success;
-  List<Product>? products;
+  final List<Product>? products;
+  final bool? success;
 
-  ProductsResponse({this.success, this.products});
+  ProductsResponse({
+    this.products,
+    this.success,
+  });
 
   factory ProductsResponse.fromJson(Map<String, dynamic> json) {
     return ProductsResponse(
+      products: (json['products'] as List?)
+          ?.map((e) => Product.fromJson(e as Map<String, dynamic>))
+          .toList(),
       success: json['success'] as bool?,
-      products: json['products'] != null
-          ? List<Product>.from(
-          (json['products'] as List).map((x) => Product.fromJson(x)))
-          : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
+    'products': products?.map((e) => e.toJson()).toList(),
     'success': success,
-    'products': products?.map((x) => x.toJson()).toList(),
   };
 }
 
 class Product {
-  int? id;
-  int? categoryId;
-  int? subCategoryId;
-  String? name;
-  String? description;
-  String? price;
-  String? image;
-  dynamic weight;
-  int? stock;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  Category? category;
-  Subcategory? subcategory;
+  final int? id;
+  final int? categoryId;
+  final int? subCategoryId;
+  final String? name;
+  final String? description;
+  final String? price;
+  final String? image;
+  final String? weight;
+  final int? stock;
+  final String? createdAt;
+  final String? updatedAt;
+  final Category? category;
+  final SubCategory? subcategory;
 
   Product({
     this.id,
@@ -51,29 +53,29 @@ class Product {
     this.subcategory,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) => Product(
-    id: json['id'] as int?,
-    categoryId: json['category_id'] as int?,
-    subCategoryId: json['sub_category_id'] as int?,
-    name: json['name'] as String?,
-    description: json['description'] as String?,
-    price: json['price'] as String?,
-    image: json['image'] as String?,
-    weight: json['weight'],
-    stock: json['stock'] as int?,
-    createdAt: json['created_at'] != null
-        ? DateTime.tryParse(json['created_at'])
-        : null,
-    updatedAt: json['updated_at'] != null
-        ? DateTime.tryParse(json['updated_at'])
-        : null,
-    category: json['category'] != null
-        ? Category.fromJson(json['category'])
-        : null,
-    subcategory: json['subcategory'] != null
-        ? Subcategory.fromJson(json['subcategory'])
-        : null,
-  );
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'] as int?,
+      categoryId: json['category_id'] as int?,
+      subCategoryId: json['sub_category_id'] as int?,
+      name: json['name'] as String?,
+      description: json['description'] as String?,
+      price: json['price']?.toString(),
+      image: json['image'] as String?,
+      weight: json['weight']?.toString(),
+      stock: json['stock'] is int
+          ? json['stock'] as int?
+          : int.tryParse(json['stock']?.toString() ?? ''),
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
+      category: json['category'] != null
+          ? Category.fromJson(json['category'] as Map<String, dynamic>)
+          : null,
+      subcategory: json['subcategory'] != null
+          ? SubCategory.fromJson(json['subcategory'] as Map<String, dynamic>)
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -85,21 +87,21 @@ class Product {
     'image': image,
     'weight': weight,
     'stock': stock,
-    'created_at': createdAt?.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
+    'created_at': createdAt,
+    'updated_at': updatedAt,
     'category': category?.toJson(),
     'subcategory': subcategory?.toJson(),
   };
 }
 
 class Category {
-  int? id;
-  String? name;
-  String? description;
-  String? image;
-  String? slug;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  final int? id;
+  final String? name;
+  final String? description;
+  final String? image;
+  final String? slug;
+  final String? createdAt;
+  final String? updatedAt;
 
   Category({
     this.id,
@@ -117,12 +119,8 @@ class Category {
     description: json['description'] as String?,
     image: json['image'] as String?,
     slug: json['slug'] as String?,
-    createdAt: json['created_at'] != null
-        ? DateTime.tryParse(json['created_at'])
-        : null,
-    updatedAt: json['updated_at'] != null
-        ? DateTime.tryParse(json['updated_at'])
-        : null,
+    createdAt: json['created_at'] as String?,
+    updatedAt: json['updated_at'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -131,21 +129,21 @@ class Category {
     'description': description,
     'image': image,
     'slug': slug,
-    'created_at': createdAt?.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
+    'created_at': createdAt,
+    'updated_at': updatedAt,
   };
 }
 
-class Subcategory {
-  int? id;
-  String? name;
-  int? categoryId;
-  String? description;
-  String? image;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+class SubCategory {
+  final int? id;
+  final String? name;
+  final int? categoryId;
+  final String? description;
+  final String? image;
+  final String? createdAt;
+  final String? updatedAt;
 
-  Subcategory({
+  SubCategory({
     this.id,
     this.name,
     this.categoryId,
@@ -155,18 +153,14 @@ class Subcategory {
     this.updatedAt,
   });
 
-  factory Subcategory.fromJson(Map<String, dynamic> json) => Subcategory(
+  factory SubCategory.fromJson(Map<String, dynamic> json) => SubCategory(
     id: json['id'] as int?,
     name: json['name'] as String?,
     categoryId: json['category_id'] as int?,
     description: json['description'] as String?,
     image: json['image'] as String?,
-    createdAt: json['created_at'] != null
-        ? DateTime.tryParse(json['created_at'])
-        : null,
-    updatedAt: json['updated_at'] != null
-        ? DateTime.tryParse(json['updated_at'])
-        : null,
+    createdAt: json['created_at'] as String?,
+    updatedAt: json['updated_at'] as String?,
   );
 
   Map<String, dynamic> toJson() => {
@@ -175,7 +169,7 @@ class Subcategory {
     'category_id': categoryId,
     'description': description,
     'image': image,
-    'created_at': createdAt?.toIso8601String(),
-    'updated_at': updatedAt?.toIso8601String(),
+    'created_at': createdAt,
+    'updated_at': updatedAt,
   };
 }

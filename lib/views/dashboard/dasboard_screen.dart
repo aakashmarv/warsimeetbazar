@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../Constants/app_colors.dart';
-import '../../viewmodels/cart_controller.dart';
+import '../products/controller/cart_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
 import 'package:permission_handler/permission_handler.dart';

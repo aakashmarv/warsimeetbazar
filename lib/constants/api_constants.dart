@@ -8,5 +8,6 @@ class ApiConstants {
   static const String getCategoryUrl = "$baseUrl/user/categories";
 
   static String productByCategoryUrl(int categoryId) => "$baseUrl/products/categories/$categoryId";
+  static String productsUrl() => "$baseUrl/products";
 
 }
