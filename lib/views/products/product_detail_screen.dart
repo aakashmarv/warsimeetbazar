@@ -9,14 +9,7 @@ import '../cart/widgets/floating_cart_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String productName;
-  final String imageUrl;
-
-  const ProductDetailScreen({
-    super.key,
-    required this.productName,
-    required this.imageUrl,
-  });
+  const ProductDetailScreen({super.key});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -42,11 +35,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     "0.25 kg", "0.5 kg", "1 kg", "1.5 kg", "2 kg", "2.5 kg",
   ];
   bool _isCollapsed = false;
+  late String productName;
+  late String imageUrl;
 
 
   @override
   void initState() {
     super.initState();
+    /// 🔹 Receive arguments from Get.toNamed()
+    final args = Get.arguments ?? {};
+    productName = args['productName'] ?? 'Unknown Product';
+    imageUrl = args['imageUrl'] ?? '';
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -129,7 +129,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     },
                     child: _isCollapsed
                         ? Text(
-                      widget.productName,
+                      productName,
                       key: const ValueKey("title"),
                       style: TextStyle(
                         fontSize: 19.sp,
@@ -147,14 +147,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       fit: StackFit.expand,
                       children: [
                         Hero(
-                          tag: widget.imageUrl,
+                          tag: imageUrl,
                           child: ClipRRect(
                             borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(18),
                               bottomRight: Radius.circular(18),
                             ),
                             child: CachedNetworkImage(
-                              imageUrl: widget.imageUrl,
+                              imageUrl: imageUrl,
                               fit: BoxFit.cover,
                               placeholder: (context, url) => Container(
                                 color: Colors.grey[200],
@@ -274,7 +274,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.productName,
+          productName,
           style: TextStyle(
             fontSize: 21.sp,
             fontWeight: FontWeight.bold,

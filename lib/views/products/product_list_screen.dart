@@ -7,6 +7,7 @@ import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/api_constants.dart';
+import '../../roots/routes.dart';
 import '../../viewmodels/category_controller.dart';
 import '../../viewmodels/products_by_category_controller.dart';
 
@@ -414,12 +415,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 itemBuilder: (context, index) {
                   final product = products[index];
                   return InkWell(
-                    onTap: () {
-                      Get.to(() => ProductDetailScreen(
-                        productName: product.name ?? "",
-                        imageUrl: "${ApiConstants.imageBaseUrl}${product.image ?? ""}",
-                      ));
-                    },
+                    onTap: () => Get.toNamed(AppRoutes.productDetail, arguments: {
+                      'productName': product.name,
+                      'imageUrl': "${ApiConstants.imageBaseUrl}${product.image ?? ""}",
+                    }),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),

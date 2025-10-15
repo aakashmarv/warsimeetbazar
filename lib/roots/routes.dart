@@ -9,6 +9,7 @@ import 'package:dry_fish/views/onboarding/onboarding_screen.dart';
 import 'package:dry_fish/views/order/order_confirmation_screen.dart';
 import 'package:dry_fish/views/order/order_screen.dart';
 import 'package:dry_fish/views/order/order_tracking_screen.dart';
+import 'package:dry_fish/views/products/product_detail_screen.dart';
 import 'package:dry_fish/views/products/product_list_screen.dart';
 import 'package:dry_fish/views/search_screen.dart';
 import 'package:dry_fish/views/splash_screen.dart';
@@ -29,6 +30,7 @@ class AppRoutes {
   static const order = '/order';
   static const contact = '/contact';
   static const productScreen = '/productScreen';
+  static const productDetail = '/productDetail';
 
   static const _defaultTransition = Transition.cupertino;
   static const _transitionDuration = Duration(milliseconds: 500);
@@ -61,6 +63,7 @@ class AppRoutes {
       _buildPage(name: order, page: () => OrderScreen()),
       _buildPage(name: contact, page: () => ContactUsScreen()),
       _buildPage(name: productScreen, page: () => ProductListScreen()),
+      _buildPage(name: productDetail, page: () => ProductDetailScreen()),
 
     ];
   }
