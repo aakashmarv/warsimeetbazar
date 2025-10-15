@@ -9,5 +9,6 @@ class ApiConstants {
 
   static String productByCategoryUrl(int categoryId) => "$baseUrl/products/categories/$categoryId";
   static String productsUrl() => "$baseUrl/products";
+  static String updateaddressUrl() => "$baseUrl/user/updateaddress";
 
 }
