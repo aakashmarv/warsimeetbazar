@@ -9,7 +9,7 @@ class CheckoutScreen extends StatelessWidget {
   final List<Map<String, dynamic>> cartItems = [
     {
       "name":
-      "Fresh Indian Baasa / Pangasius / Pangas - Bengali Cut (May include head piece) (480g to 500g Pack) (Whole Fish 1kg to 3kg)",
+          "Fresh Indian Baasa / Pangasius / Pangas - Bengali Cut (May include head piece) (480g to 500g Pack) (Whole Fish 1kg to 3kg)",
       "price": 398,
       "originalPrice": 582,
       "qty": 2,
@@ -17,7 +17,7 @@ class CheckoutScreen extends StatelessWidget {
     },
     {
       "name":
-      "Premium Tender and Antibiotic-residue-free Chicken - Curry Cut (Skinless) (450g Pack)",
+          "Premium Tender and Antibiotic-residue-free Chicken - Curry Cut (Skinless) (450g Pack)",
       "price": 159,
       "originalPrice": 224,
       "qty": 1,
@@ -67,8 +67,7 @@ class CheckoutScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderGrey,
-                width: 1)
+                border: Border.all(color: AppColors.borderGrey, width: 1),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +108,7 @@ class CheckoutScreen extends StatelessWidget {
                         color: Colors.green[700],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -154,43 +153,48 @@ class CheckoutScreen extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 13.sp,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                               SizedBox(height: 0.5.h),
-                              Text(
-                                "Qty: ${item["qty"]}",
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: Colors.grey[600],
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Qty: ${item["qty"]}",
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "₹${item["price"]}",
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      SizedBox(height: 0.5.h),
+                                      Text(
+                                        "₹${item["originalPrice"]}",
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: Colors.grey,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              "₹${item["price"]}",
-                              style: TextStyle(
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 0.5.h),
-                            Text(
-                              "₹${item["originalPrice"]}",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: Colors.grey,
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                          ],
-                        )
                       ],
                     ),
                   );
@@ -210,7 +214,7 @@ class CheckoutScreen extends StatelessWidget {
                     color: Colors.black12,
                     blurRadius: 6,
                     offset: const Offset(0, 3),
-                  )
+                  ),
                 ],
               ),
               child: Column(
@@ -233,7 +237,7 @@ class CheckoutScreen extends StatelessWidget {
                     child: Text(
                       "You are saving ₹${cartItems.fold(0.0, (sum, item) => sum + ((item["originalPrice"] - item["price"]) * item["qty"]))} on this order",
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 13.sp,
                         color: Colors.red,
                         fontWeight: FontWeight.w500,
                       ),
@@ -266,16 +270,18 @@ class CheckoutScreen extends StatelessWidget {
               Text(
                 "$totalItems Items | ₹${totalAmount.toStringAsFixed(0)}",
                 style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white),
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
               Text(
                 "Place Order",
                 style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
@@ -284,15 +290,19 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 
-  Widget priceRow(String title, double value,
-      {bool isBold = false, Color? color}) {
+  Widget priceRow(
+    String title,
+    double value, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
           style: TextStyle(
-            fontSize: 13.sp,
+            fontSize: 14.sp,
             color: Colors.grey[800],
             fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
           ),
