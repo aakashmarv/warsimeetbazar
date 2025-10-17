@@ -37,41 +37,6 @@ class _CartScreenState extends State<CartScreen> {
       "packs": "1 pack",
       "image": "assets/images/banner2.jpg"
     },
-    {
-      "name": "Farm Fresh Mutton - Curry Cut (With Bone)",
-      "price": 549,
-      "qty": 1,
-      "packs": "1 pack",
-      "image": "assets/images/banner2.jpg"
-    },
-    {
-      "name": "Prawns - Medium Size, Cleaned & Deveined",
-      "price": 299,
-      "qty": 2,
-      "packs": "2 pack",
-      "image": "assets/images/banner2.jpg"
-    },
-    {
-      "name": "Rohu Fish - Bengali Cut",
-      "price": 225,
-      "qty": 1,
-      "packs": "1 pack",
-      "image": "assets/images/banner2.jpg"
-    },
-    {
-      "name": "Country Chicken (Nattu Kozhi) - Curry Cut",
-      "price": 399,
-      "qty": 1,
-      "packs": "1 pack",
-      "image": "assets/images/banner2.jpg"
-    },
-    {
-      "name": "Eggs - Farm Fresh Brown Eggs (Pack of 6)",
-      "price": 89,
-      "qty": 1,
-      "packs": "1 pack",
-      "image": "assets/images/banner2.jpg"
-    },
   ];
 
   void updateQuantity(int index, int change) {
@@ -104,7 +69,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     // final statusBarHeight = MediaQuery.of(context).padding.top;
-    return Scaffold(
+    return Scaffold(        
       backgroundColor: AppColors.bgColor,
       appBar: widget.showAppBar
           ? AppBar(
