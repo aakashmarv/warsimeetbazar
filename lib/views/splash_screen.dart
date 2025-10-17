@@ -5,15 +5,16 @@ import 'package:get/get.dart';
 import '../constants/app_keys.dart';
 import '../roots/routes.dart';
 import '../services/sharedpreferences_service.dart';
+import '../viewmodels/internet_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -26,29 +27,35 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _controller.forward();
     _initialize();
   }
 
-  Future<void> _initialize() async {
-    final prefs = await SharedPreferencesService.getInstance();
-    bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
-    await Future.delayed(const Duration(seconds: 3));
-    if (!isLogged) {
-      Get.offAllNamed(AppRoutes.onboarding);
-    }  else {
-      Get.offAllNamed(AppRoutes.dashBoard);
-    }
-  }
+Future<void> _initialize() async {
+  final internetController = Get.find<InternetController>();
 
+  await Future.delayed(const Duration(seconds: 3));
+
+  final prefs = await SharedPreferencesService.getInstance();
+  bool isLogged = prefs.getBool(AppKeys.isLogin) ?? false;
+
+  if (!isLogged) {
+    Get.offAllNamed(AppRoutes.onboarding);
+  } else {
+    Get.offAllNamed(AppRoutes.dashBoard);
+  }
+  internetController.showPopup = true;
+}
   @override
   void dispose() {
     _controller.dispose();
@@ -58,14 +65,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final imageSize = screenWidth * 0.60; // 60% of screen width
-
+    final imageSize = screenWidth * 0.60;
     return Scaffold(
       backgroundColor: AppColors.bgColor,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background watermark image with fade-in
           FadeTransition(
             opacity: _fadeAnimation,
             child: Image.asset(

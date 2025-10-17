@@ -684,7 +684,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
               hintText: hint,
               counterText: maxLength != null
                   ? ""
-                  : null, // hide counter only if maxLength set
+                  : null, 
               hintStyle: TextStyle(
                 fontSize: size.width * 0.035,
                 color: Colors.grey,
