@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../constants/api_constants.dart';
 import '../../Constants/app_colors.dart';
 import '../../roots/routes.dart';
+import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/category_controller.dart';
 import '../../viewmodels/products_controller.dart';
 import '../cart/widgets/floating_cart_bar.dart';
-import '../products/controller/cart_controller.dart';
 import 'widgets/carousel_banner.dart';
 import 'widgets/best_sell_product_card.dart';
 import 'widgets/category_grid.dart';
@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final CartController cartController = Get.find<CartController>();
+  final CartItemController cartController = Get.put(CartItemController());
   final CategoryController categoryController = Get.put(CategoryController());
   final ProductsController productsController = Get.put(ProductsController());
 
@@ -45,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     productsController.getProducts();
     categoryController.getCategory();
+    cartController.fetchItems();
   }
 
   @override
@@ -101,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             subtitle: product.description ?? "",
                             imageUrl: imageUrl,
                             price: "₹${product.price ?? '0'}",
+                            productId: product.id.toString(),
                           );
                         },
                       ),

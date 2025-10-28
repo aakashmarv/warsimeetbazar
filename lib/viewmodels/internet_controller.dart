@@ -36,7 +36,7 @@ Future<void> waitForConnection() async {
     if (result == ConnectivityResult.none || !(await _hasInternetAccess())) {
       if (isConnected.value) {
         isConnected.value = false;
-                if (showPopup) _showNoInternetDialog(); // 👈 popup only if allowed
+                if (showPopup) _showNoInternetDialog();
 
       }
     } else {

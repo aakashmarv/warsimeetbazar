@@ -1,8 +1,8 @@
-import 'package:dry_fish/views/products/controller/cart_controller.dart';
-import 'package:dry_fish/views/products/product_detail_screen.dart';
+// import 'package:dry_fish/views/products/controller/cart_controller.dart';
+// import 'package:dry_fish/views/products/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sizer/sizer.dart';
+// import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../Constants/app_colors.dart';
-import '../products/controller/cart_controller.dart';
+import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -22,7 +22,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final DashboardController controller = Get.put(DashboardController());
-  final CartController cartController = Get.put(CartController());
+  final CartItemController cartController = Get.put(CartItemController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Widget> _screens = [

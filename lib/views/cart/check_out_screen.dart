@@ -1,42 +1,49 @@
-import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
+import '../../constants/api_constants.dart';
+import '../../repositories/placeorder_repository.dart';
+import '../../viewmodels/placeorder_controller.dart';
+import '../../viewmodels/cart_item_controller.dart';
+import '../../roots/routes.dart';
 
-class CheckoutScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> cartItems = [
-    {
-      "name":
-          "Fresh Indian Baasa / Pangasius / Pangas - Bengali Cut (May include head piece) (480g to 500g Pack) (Whole Fish 1kg to 3kg)",
-      "price": 398,
-      "originalPrice": 582,
-      "qty": 2,
-      "image": "assets/images/banner2.jpg",
-    },
-    {
-      "name":
-          "Premium Tender and Antibiotic-residue-free Chicken - Curry Cut (Skinless) (450g Pack)",
-      "price": 159,
-      "originalPrice": 224,
-      "qty": 1,
-      "image": "assets/images/banner2.jpg",
-    },
-  ];
+class CheckoutScreen extends StatefulWidget {
+  const CheckoutScreen({super.key});
 
+  @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
   final double shippingFee = 29;
   final double handlingFee = 4;
 
-  CheckoutScreen({super.key});
+  final PlaceOrderController orderController = Get.put(
+    PlaceOrderController(repository: PlaceorderRepository()),
+  );
 
-  double get subtotal =>
-      cartItems.fold(0, (sum, item) => sum + (item["price"] * item["qty"]));
+  final CartItemController cartItemController = Get.put(CartItemController());
 
-  double get totalAmount => subtotal + shippingFee + handlingFee;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartItemController.fetchItems(); // ✅ Safe after first frame
+    });
+  }
 
-  int get totalItems =>
-      cartItems.fold(0, (sum, item) => sum + (item["qty"] as int));
+  double subtotal() => cartItemController.cartItems.fold(
+    0,
+    (sum, item) => sum + (item.total),
+  );
+
+  double totalAmount() => subtotal() + shippingFee + handlingFee;
+
+  int totalItems() => cartItemController.cartItems.fold(
+    0,
+    (sum, item) => sum + (item.quantity),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -55,238 +62,222 @@ class CheckoutScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 1.h),
 
-            /// Delivery Address Section
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderGrey, width: 1),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.location_on, color: Colors.red, size: 22.sp),
-                  SizedBox(width: 3.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Delivery Address",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 0.5.h),
-                        Text(
-                          "John Doe, 221B Baker Street, Near Metro Station, Bengaluru, Karnataka - 560001",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.newAddress);
-                    },
-                    child: Text(
-                      "Change",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.green[700],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 2.h),
+      body: Obx(() {
+        if (cartItemController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            /// Order Summary Header
-            Text(
-              "Order Summary",
-              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+        if (cartItemController.errorMessage.isNotEmpty) {
+          return Center(
+            child: Text(
+              cartItemController.errorMessage.value,
+              style: const TextStyle(color: Colors.red),
             ),
-            SizedBox(height: 1.h),
+          );
+        }
 
-            /// Cart Items List
-            Expanded(
-              child: ListView.separated(
-                itemCount: cartItems.length,
-                separatorBuilder: (_, __) =>
-                    Divider(height: 1, color: Colors.grey[300]),
-                itemBuilder: (context, index) {
-                  final item = cartItems[index];
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 1.5.h),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            item["image"],
-                            width: 22.w,
-                            height: 8.h,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(width: 3.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item["name"],
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 0.5.h),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Qty: ${item["qty"]}",
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "₹${item["price"]}",
-                                        style: TextStyle(
-                                          fontSize: 15.sp,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      SizedBox(height: 0.5.h),
-                                      Text(
-                                        "₹${item["originalPrice"]}",
-                                        style: TextStyle(
-                                          fontSize: 12.sp,
-                                          color: Colors.grey,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
+        final items = cartItemController.cartItems;
 
-            /// Price Details Card
-            Container(
-              padding: EdgeInsets.all(3.w),
-              margin: EdgeInsets.only(top: 1.h, bottom: 2.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  priceRow("Item Subtotal (Inc. of GST)", subtotal),
-                  SizedBox(height: 0.8.h),
-                  priceRow("Shipping", shippingFee),
-                  SizedBox(height: 0.8.h),
-                  priceRow("Handling Fee", handlingFee),
-                  Divider(color: Colors.grey[300]),
-                  priceRow(
-                    "Total Amount",
-                    totalAmount,
-                    isBold: true,
-                    color: Colors.green[700],
-                  ),
-                  SizedBox(height: 0.8.h),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "You are saving ₹${cartItems.fold(0.0, (sum, item) => sum + ((item["originalPrice"] - item["price"]) * item["qty"]))} on this order",
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        if (items.isEmpty) {
+          return const Center(
+            child: Text(
+              "Your cart is empty",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-          ],
-        ),
-      ),
+          );
+        }
 
-      /// Floating Place Order Bar
-      bottomNavigationBar: Container(
-        margin: EdgeInsets.only(bottom: 4.h, left: 4.w, right: 4.w),
-        height: 6.5.h,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          onPressed: () {
-            Get.toNamed(AppRoutes.orderConfirmer);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 2.h),
               Text(
-                "$totalItems Items | ₹${totalAmount.toStringAsFixed(0)}",
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                "Order Summary",
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 1.h),
+
+              /// Cart List
+              Expanded(
+                child: ListView.separated(
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) =>
+                      Divider(height: 1, color: Colors.grey[300]),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    final imageUrl = item.product.image.isNotEmpty
+                        ? "${ApiConstants.imageBaseUrl}${item.product.image}"
+                        : "assets/images/banner2.jpg";
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              imageUrl,
+                              width: 22.w,
+                              height: 8.h,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.image, size: 40),
+                            ),
+                          ),
+                          SizedBox(width: 3.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.product.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: 0.5.h),
+                                Text(
+                                  "${item.product} | ${item.product.weight}",
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                SizedBox(height: 0.5.h),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Qty: ${item.quantity}",
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      "₹${item.total.toStringAsFixed(0)}",
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-              Text(
-                "Place Order",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
+
+              /// Totals section
+              Container(
+                padding: EdgeInsets.all(3.w),
+                margin: EdgeInsets.only(top: 1.h, bottom: 2.h),
+                decoration: BoxDecoration(
                   color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    priceRow("Item Subtotal", subtotal()),
+                    priceRow("Shipping", shippingFee),
+                    priceRow("Handling Fee", handlingFee),
+                    const Divider(),
+                    priceRow(
+                      "Total Amount",
+                      totalAmount(),
+                      isBold: true,
+                      color: Colors.green[700],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      }),
+
+      /// Place Order Button
+      bottomNavigationBar: Obx(() {
+        final items = cartItemController.cartItems;
+        final total = totalAmount();
+        final tItems = totalItems();
+
+        return Container(
+          margin: EdgeInsets.only(bottom: 4.h, left: 4.w, right: 4.w),
+          height: 6.5.h,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async {
+              if (items.isEmpty) return;
+              await orderController.placeOrder();
+              if (orderController.orderResponse.value != null) {
+                Get.snackbar(
+                  "Success",
+                  "Order placed successfully",
+                  snackPosition: SnackPosition.BOTTOM,
+                );
+                cartItemController.cartItems.clear();
+                Get.toNamed(AppRoutes.orderConfirmer);
+              } else {
+                Get.snackbar(
+                  "Error",
+                  orderController.errorMessage.value,
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.redAccent,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            child: orderController.isLoading.value
+                ? const CircularProgressIndicator(color: Colors.white)
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "$tItems Items | ₹${total.toStringAsFixed(0)}",
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "Place Order",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      }),
     );
   }
 
@@ -303,7 +294,6 @@ class CheckoutScreen extends StatelessWidget {
           title,
           style: TextStyle(
             fontSize: 14.sp,
-            color: Colors.grey[800],
             fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
