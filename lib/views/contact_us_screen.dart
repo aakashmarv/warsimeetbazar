@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
-import '../../widgets/custom_text_app_bar.dart';
 
 class ContactUsScreen extends StatelessWidget {
   const ContactUsScreen({super.key});
@@ -10,13 +9,25 @@ class ContactUsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgColor,
-      appBar: const CustomTextAppBar(title: "Contact Us"),
+      appBar: AppBar(
+        title: Text(
+          "Contact Us",
+          style: TextStyle(
+            fontSize: 17.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.white,
+          ),
+        ),
+        iconTheme: IconThemeData(
+          size: 7.w,
+          color: AppColors.white
+        ),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /// Logo
             Container(
               height: 14.h,
               width: 14.h,
@@ -24,16 +35,19 @@ class ContactUsScreen extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: AppColors.extraLightestPrimary,
               ),
-              child: Icon(Icons.support_agent,
-                  size: 40.sp, color: AppColors.primary),
+              child: Icon(
+                Icons.support_agent,
+                size: 40.sp,
+                color: AppColors.primary,
+              ),
             ),
             SizedBox(height: 2.h),
 
             Text(
-              "We’re here to help!",
+              "We’re here to help !",
               style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w700,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
             ),
@@ -42,8 +56,9 @@ class ContactUsScreen extends StatelessWidget {
               "If you have any questions or need support, feel free to reach us.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.grey[700],
+                fontSize: 13.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[500],
               ),
             ),
 
@@ -80,11 +95,10 @@ class ContactUsScreen extends StatelessWidget {
             /// Contact Form
             Align(
               alignment: Alignment.centerLeft,
-              child: Text("Send us a message",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w700,
-                  )),
+              child: Text(
+                "Send us a message",
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              ),
             ),
             SizedBox(height: 2.h),
 
@@ -92,7 +106,7 @@ class ContactUsScreen extends StatelessWidget {
             SizedBox(height: 1.5.h),
             _inputField(label: "Email"),
             SizedBox(height: 1.5.h),
-            _inputField(label: "Message", maxLines: 4),
+            _inputField(label: "Message", maxLines: 3),
 
             SizedBox(height: 3.h),
 
@@ -113,7 +127,7 @@ class ContactUsScreen extends StatelessWidget {
                 child: Text(
                   "Submit",
                   style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -162,20 +176,23 @@ class ContactUsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
                 SizedBox(height: 0.3.h),
-                Text(value,
-                    style: TextStyle(
-                        fontSize: 10.sp, color: Colors.grey[700])),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
+                ),
               ],
             ),
           ),
-          Icon(Icons.arrow_forward_ios,
-              size: 14.sp, color: Colors.grey[500]),
+          Icon(Icons.arrow_forward_ios, size: 6.w, color: Colors.grey[500]),
         ],
       ),
     );
@@ -186,15 +203,28 @@ class ContactUsScreen extends StatelessWidget {
     return TextField(
       maxLines: maxLines,
       decoration: InputDecoration(
+        isDense: true,
         labelText: label,
-        labelStyle: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 3.w),
-        border: OutlineInputBorder(
+
+        // ✅ Default Border (when not focused)
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(
+            color: Colors.grey.shade400,
+            width: 0.4, // <-- Border width control here
+          ),
         ),
+
+        // ✅ Border when TextField is focused
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.primary, width: 0.6),
+        ),
+
+        // ✅ Optional: If you want same border for error state
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

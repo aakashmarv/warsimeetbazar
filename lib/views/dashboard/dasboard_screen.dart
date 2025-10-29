@@ -73,8 +73,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Placemark place = placemarks.first;
         setState(() {
           currentAddress =
-              "${place.street}, ${place.locality}, ${place.administrativeArea}";
+              "${place.street}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode},";
         });
+        print(" your current address is == ${currentAddress}|| ${position.latitude} || ${position.longitude}");
       }
     } catch (e) {
       setState(() {

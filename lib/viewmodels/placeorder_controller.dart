@@ -42,9 +42,8 @@ import 'package:dry_fish/models/responses/placeorder_response.dart';
 import '../repositories/placeorder_repository.dart';
 
 class PlaceOrderController extends GetxController {
-  final PlaceorderRepository repository;
-
-  PlaceOrderController({required this.repository});
+final PlaceorderRepository repository = PlaceorderRepository();
+  // PlaceOrderController();
 
   var isLoading = false.obs;
   var errorMessage = ''.obs;

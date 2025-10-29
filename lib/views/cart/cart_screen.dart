@@ -26,10 +26,12 @@ class _CartScreenState extends State<CartScreen> {
   final RemoveCartItemController removeCartItemController = Get.put(
     RemoveCartItemController(),
   );
-final ReduceQuantityController reduceQuantityController =
-    Get.put(ReduceQuantityController());
-final IncreaseQuantityController increaseQuantityController =
-    Get.put(IncreaseQuantityController());
+  final ReduceQuantityController reduceQuantityController = Get.put(
+    ReduceQuantityController(),
+  );
+  final IncreaseQuantityController increaseQuantityController = Get.put(
+    IncreaseQuantityController(),
+  );
   @override
   void initState() {
     super.initState();
@@ -69,7 +71,6 @@ final IncreaseQuantityController increaseQuantityController =
         }
 
         if (cartitemController.errorMessage.isNotEmpty) {
-          /// 🔹 Show Error Message
           return Center(
             child: Text(
               "Your cart is empty",
@@ -156,8 +157,7 @@ final IncreaseQuantityController increaseQuantityController =
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          // "${item.product. ?? ''} |
-                                          " ${item.product.weight ?? ''}",
+                                          " ${item.weight} kg  |  Qty: ${item.quantity}",
                                           style: TextStyle(
                                             fontSize: 14.sp,
                                             color: Colors.grey[600],
@@ -188,36 +188,13 @@ final IncreaseQuantityController increaseQuantityController =
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
- 
-
-                                  
                                   TextButton.icon(
                                     onPressed: () async {
                                       final id = item.id.toString();
                                       await removeCartItemController
                                           .removeCartItem(id);
-
-                                      if (removeCartItemController
-                                          .successMessage
-                                          .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Success',
-                                          removeCartItemController
-                                              .successMessage
-                                              .value,
-                                        );
-                                        cartitemController
-                                            .fetchItems();
-                                      } else if (removeCartItemController
-                                          .errorMessage
-                                          .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Error',
-                                          removeCartItemController
-                                              .errorMessage
-                                              .value,
-                                        );
-                                      }
+                                      cartitemController
+                                          .fetchItems(); // ✅ Only Refresh
                                     },
                                     icon: const Icon(
                                       Icons.delete_outline,
@@ -229,67 +206,30 @@ final IncreaseQuantityController increaseQuantityController =
                                   /// Quantity selector
                                   Row(
                                     children: [
-
                                       IconButton(
                                         onPressed: () async {
-                                          final id = item.id.toString();
                                           await reduceQuantityController
-                                              .reduceQuantity(id);
-
-                                          if (reduceQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                          }
+                                              .reduceQuantity(
+                                                item.id.toString(),
+                                              );
+                                          cartitemController.fetchItems();
                                         },
+
                                         icon: const Icon(Icons.remove),
                                       ),
                                       Text("${item.quantity}"),
 
                                       IconButton(
                                         onPressed: () async {
-                                          final id = item.id.toString();
                                           await increaseQuantityController
-                                              .increaseQuantity(id);
-
-                                          if (increaseQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                          }
+                                              .increaseQuantity(
+                                                item.id.toString(),
+                                              );
+                                          cartitemController.fetchItems();
                                         },
+
                                         icon: const Icon(Icons.add),
                                       ),
-                                  
-                                  
                                     ],
                                   ),
                                 ],
@@ -327,8 +267,6 @@ final IncreaseQuantityController increaseQuantityController =
           ],
         );
       }),
-    
-    
     );
   }
 }

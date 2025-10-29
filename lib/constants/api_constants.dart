@@ -12,6 +12,7 @@ class ApiConstants {
   static String removefromcarturl = "$baseUrl/user/removefromcart";
   static String reducequantityurl = "$baseUrl/user/reduceqty";
   static String increasequantityurl = "$baseUrl/user/increaseqty";
+  static String orderListUrl = "$baseUrl/user/orders";
 
   static String productByCategoryUrl(int categoryId) =>
       "$baseUrl/products/categories/$categoryId";

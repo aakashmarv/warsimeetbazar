@@ -31,6 +31,7 @@ class CartItem {
   final int productId;
    int quantity;
   final double price;
+  final double weight;
   final double total;
   final String status;
   final String createdAt;
@@ -43,6 +44,7 @@ class CartItem {
     required this.productId,
     required this.quantity,
     required this.price,
+    required this.weight,
     required this.total,
     required this.status,
     required this.createdAt,
@@ -57,6 +59,7 @@ class CartItem {
       productId: json['product_id'] ?? 0,
       quantity: json['quantity'] ?? 0,
       price: double.tryParse(json['price'].toString()) ?? 0.0,
+      weight: double.tryParse(json['weight'].toString()) ?? 0.0,
       total: double.tryParse(json['total'].toString()) ?? 0.0,
       status: json['status'] ?? '',
       createdAt: json['created_at'] ?? '',

@@ -1,12 +1,11 @@
+import 'package:dry_fish/roots/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
-import '../../repositories/placeorder_repository.dart';
 import '../../viewmodels/placeorder_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
-import '../../roots/routes.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -19,9 +18,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final double shippingFee = 29;
   final double handlingFee = 4;
 
-  final PlaceOrderController orderController = Get.put(
-    PlaceOrderController(repository: PlaceorderRepository()),
-  );
+  final PlaceOrderController orderController = Get.put(PlaceOrderController());
 
   final CartItemController cartItemController = Get.put(CartItemController());
 
@@ -29,38 +26,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      cartItemController.fetchItems(); // ✅ Safe after first frame
+      cartItemController.fetchItems();
     });
   }
 
-  double subtotal() => cartItemController.cartItems.fold(
-    0,
-    (sum, item) => sum + (item.total),
-  );
+  double subtotal() =>
+      cartItemController.cartItems.fold(0, (sum, item) => sum + item.total);
+
+  int totalItems() =>
+      cartItemController.cartItems.fold(0, (sum, item) => sum + item.quantity);
 
   double totalAmount() => subtotal() + shippingFee + handlingFee;
-
-  int totalItems() => cartItemController.cartItems.fold(
-    0,
-    (sum, item) => sum + (item.quantity),
-  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgColor,
       appBar: AppBar(
-        backgroundColor: AppColors.extraLightestPrimary,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          "Checkout",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: const Text("Checkout"),
+        leading: BackButton(onPressed: () => Navigator.pop(context)),
       ),
 
       body: Obx(() {
@@ -68,18 +51,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (cartItemController.errorMessage.isNotEmpty) {
-          return Center(
-            child: Text(
-              cartItemController.errorMessage.value,
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        }
-
-        final items = cartItemController.cartItems;
-
-        if (items.isEmpty) {
+        if (cartItemController.cartItems.isEmpty) {
           return const Center(
             child: Text(
               "Your cart is empty",
@@ -88,11 +60,66 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           );
         }
 
+        final items = cartItemController.cartItems;
+
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 1.h),
+
+              /// ✅ Delivery Address (Not Removed / Not Changed)
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderGrey, width: 1),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.location_on, color: Colors.red, size: 22.sp),
+                    SizedBox(width: 3.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Delivery Address",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 0.5.h),
+                          Text(
+                            "John Doe, 221B Baker Street, Near Metro Station, Bengaluru, Karnataka - 560001",
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.toNamed(AppRoutes.newAddress);
+                      },
+                      child: Text(
+                        "Change",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               SizedBox(height: 2.h),
               Text(
                 "Order Summary",
@@ -100,7 +127,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               SizedBox(height: 1.h),
 
-              /// Cart List
               Expanded(
                 child: ListView.separated(
                   itemCount: items.length,
@@ -111,6 +137,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     final imageUrl = item.product.image.isNotEmpty
                         ? "${ApiConstants.imageBaseUrl}${item.product.image}"
                         : "assets/images/banner2.jpg";
+
                     return Padding(
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
                       child: Row(
@@ -123,7 +150,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               height: 8.h,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.image, size: 40),
+                                  const Icon(Icons.image, size: 45),
                             ),
                           ),
                           SizedBox(width: 3.w),
@@ -165,7 +192,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       style: TextStyle(
                                         fontSize: 15.sp,
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -180,20 +206,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
 
-              /// Totals section
+              /// ✅ Price Details Section
               Container(
                 padding: EdgeInsets.all(3.w),
                 margin: EdgeInsets.only(top: 1.h, bottom: 2.h),
                 decoration: BoxDecoration(
-                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
                 ),
                 child: Column(
                   children: [
@@ -215,11 +235,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       }),
 
-      /// Place Order Button
+      /// ✅ Place Order Button
       bottomNavigationBar: Obx(() {
-        final items = cartItemController.cartItems;
-        final total = totalAmount();
         final tItems = totalItems();
+        final total = totalAmount();
 
         return Container(
           margin: EdgeInsets.only(bottom: 4.h, left: 4.w, right: 4.w),
@@ -232,14 +251,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ),
             onPressed: () async {
-              if (items.isEmpty) return;
+              if (cartItemController.cartItems.isEmpty) return;
+
               await orderController.placeOrder();
+
               if (orderController.orderResponse.value != null) {
-                Get.snackbar(
-                  "Success",
-                  "Order placed successfully",
-                  snackPosition: SnackPosition.BOTTOM,
-                );
                 cartItemController.cartItems.clear();
                 Get.toNamed(AppRoutes.orderConfirmer);
               } else {
@@ -298,11 +314,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ),
         Text(
-          "₹${value.toStringAsFixed(2)}",
+          "₹${value.toStringAsFixed(0)}",
           style: TextStyle(
-            fontSize: 15.sp,
+            fontSize: 14.sp,
             fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
-            color: color ?? Colors.grey[800],
+            color: color,
           ),
         ),
       ],
