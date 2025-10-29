@@ -188,106 +188,197 @@ final IncreaseQuantityController increaseQuantityController =
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
- 
+                                  TextButton.icon(
+  onPressed: () async {
+    final id = item.id;
+    cartitemController.itemLoading[id]?.value = true;
+
+    await removeCartItemController.removeCartItem(id.toString());
+
+    if (removeCartItemController.successMessage.isNotEmpty) {
+      cartitemController.cartItems.remove(item);
+      cartitemController.updateTotals();
+      Get.snackbar('Success', removeCartItemController.successMessage.value);
+    } else {
+      Get.snackbar('Error', removeCartItemController.errorMessage.value);
+    }
+
+    cartitemController.itemLoading[id]?.value = false;
+  },
+  icon: Obx(() {
+    final loading = cartitemController.itemLoading[item.id]?.value ?? false;
+    return loading
+        ? const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(Icons.delete_outline, size: 18);
+  }),
+  label: const Text("Remove"),
+),
 
                                   
-                                  TextButton.icon(
-                                    onPressed: () async {
-                                      final id = item.id.toString();
-                                      await removeCartItemController
-                                          .removeCartItem(id);
+                                  // TextButton.icon(
+                                  //   onPressed: () async {
+                                  //     final id = item.id.toString();
+                                  //     await removeCartItemController
+                                  //         .removeCartItem(id);
 
-                                      if (removeCartItemController
-                                          .successMessage
-                                          .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Success',
-                                          removeCartItemController
-                                              .successMessage
-                                              .value,
-                                        );
-                                        cartitemController
-                                            .fetchItems();
-                                      } else if (removeCartItemController
-                                          .errorMessage
-                                          .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Error',
-                                          removeCartItemController
-                                              .errorMessage
-                                              .value,
-                                        );
-                                      }
-                                    },
-                                    icon: const Icon(
-                                      Icons.delete_outline,
-                                      size: 18,
-                                    ),
-                                    label: const Text("Remove"),
-                                  ),
+                                  //     if (removeCartItemController
+                                  //         .successMessage
+                                  //         .isNotEmpty) {
+                                  //       Get.snackbar(
+                                  //         'Success',
+                                  //         removeCartItemController
+                                  //             .successMessage
+                                  //             .value,
+                                  //       );
+                                  //       cartitemController
+                                  //           .fetchItems();
+                                  //     } else if (removeCartItemController
+                                  //         .errorMessage
+                                  //         .isNotEmpty) {
+                                  //       Get.snackbar(
+                                  //         'Error',
+                                  //         removeCartItemController
+                                  //             .errorMessage
+                                  //             .value,
+                                  //       );
+                                  //     }
+                                  //   },
+                                  //   icon: const Icon(
+                                  //     Icons.delete_outline,
+                                  //     size: 18,
+                                  //   ),
+                                  //   label: const Text("Remove"),
+                                  // ),
 
                                   /// Quantity selector
                                   Row(
                                     children: [
 
                                       IconButton(
-                                        onPressed: () async {
-                                          final id = item.id.toString();
-                                          await reduceQuantityController
-                                              .reduceQuantity(id);
+  onPressed: () async {
+    final id = item.id;
+    cartitemController.itemLoading[id]?.value = true;
 
-                                          if (reduceQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                          }
-                                        },
-                                        icon: const Icon(Icons.remove),
-                                      ),
+    await reduceQuantityController.reduceQuantity(id.toString());
+
+    if (reduceQuantityController.isSuccess.isTrue) {
+      // Update only this item's quantity locally
+      item.quantity -= 1;
+      if (item.quantity < 1) {
+        cartitemController.cartItems.remove(item);
+      }
+      cartitemController.updateTotals();
+      Get.snackbar('Success', reduceQuantityController.message.value);
+    } else {
+      Get.snackbar('Error', reduceQuantityController.message.value);
+    }
+
+    cartitemController.itemLoading[id]?.value = false;
+  },
+  icon: Obx(() {
+    final loading = cartitemController.itemLoading[item.id]?.value ?? false;
+    return loading
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(Icons.remove);
+  }),
+),
+
+                                      // IconButton(
+                                      //   onPressed: () async {
+                                      //     final id = item.id.toString();
+                                      //     await reduceQuantityController
+                                      //         .reduceQuantity(id);
+
+                                      //     if (reduceQuantityController
+                                      //         .isSuccess
+                                      //         .isTrue) {
+                                      //       Get.snackbar(
+                                      //         'Success',
+                                      //         reduceQuantityController
+                                      //             .message
+                                      //             .value,
+                                      //       );
+                                      //       cartitemController
+                                      //           .fetchItems();
+                                      //     } else {
+                                      //       Get.snackbar(
+                                      //         'Error',
+                                      //         reduceQuantityController
+                                      //             .message
+                                      //             .value,
+                                      //       );
+                                      //     }
+                                      //   },
+                                      //   icon: const Icon(Icons.remove),
+                                      // ),
                                       Text("${item.quantity}"),
 
-                                      IconButton(
-                                        onPressed: () async {
-                                          final id = item.id.toString();
-                                          await increaseQuantityController
-                                              .increaseQuantity(id);
+IconButton(
+  onPressed: () async {
+    final id = item.id;
+    cartitemController.itemLoading[id]?.value = true;
 
-                                          if (increaseQuantityController
-                                              .isSuccess
-                                              .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                            cartitemController
-                                                .fetchItems();
-                                          } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
-                                          }
-                                        },
-                                        icon: const Icon(Icons.add),
-                                      ),
+    await increaseQuantityController.increaseQuantity(id.toString());
+
+    if (increaseQuantityController.isSuccess.isTrue) {
+      item.quantity += 1;
+      cartitemController.updateTotals();
+      Get.snackbar('Success', increaseQuantityController.message.value);
+    } else {
+      Get.snackbar('Error', increaseQuantityController.message.value);
+    }
+
+    cartitemController.itemLoading[id]?.value = false;
+  },
+  icon: Obx(() {
+    final loading = cartitemController.itemLoading[item.id]?.value ?? false;
+    return loading
+        ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(Icons.add);
+  }),
+),
+
+
+                                      // IconButton(
+                                      //   onPressed: () async {
+                                      //     final id = item.id.toString();
+                                      //     await increaseQuantityController
+                                      //         .increaseQuantity(id);
+
+                                      //     if (increaseQuantityController
+                                      //         .isSuccess
+                                      //         .isTrue) {
+                                      //       Get.snackbar(
+                                      //         'Success',
+                                      //         increaseQuantityController
+                                      //             .message
+                                      //             .value,
+                                      //       );
+                                      //       cartitemController
+                                      //           .fetchItems();
+                                      //     } else {
+                                      //       Get.snackbar(
+                                      //         'Error',
+                                      //         increaseQuantityController
+                                      //             .message
+                                      //             .value,
+                                      //       );
+                                      //     }
+                                      //   },
+                                      //   icon: const Icon(Icons.add),
+                                      // ),
                                   
                                   
                                     ],

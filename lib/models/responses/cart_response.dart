@@ -29,7 +29,7 @@ class CartItem {
   final int id;
   final int userId;
   final int productId;
-  final int quantity;
+   int quantity;
   final double price;
   final double total;
   final String status;

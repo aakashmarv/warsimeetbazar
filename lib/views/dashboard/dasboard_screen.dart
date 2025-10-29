@@ -7,11 +7,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import '../../Constants/app_colors.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -25,6 +27,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final CartItemController cartController = Get.put(CartItemController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  String currentAddress = "Fetching your location...";
+  Position? currentPosition;
+
   final List<Widget> _screens = [
     const HomeScreen(),
     SearchScreen(),
@@ -35,14 +40,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _showLocationBottomSheet();
+      await _getCurrentLocation();
+      cartController.fetchItems();
     });
   }
 
+  /// 🔹 Get current location & convert to address
+  Future<void> _getCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        setState(() {
+          currentAddress = "Location permission denied";
+        });
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      setState(() {
+        currentPosition = position;
+      });
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          currentAddress =
+              "${place.street}, ${place.locality}, ${place.administrativeArea}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        currentAddress = "Error getting location: $e";
+      });
+    }
+  }
+
+  /// 🔹 Request app permissions
   Future<void> _requestPermissions() async {
-    // Location Permission
     var locationStatus = await Permission.locationWhenInUse.request();
     if (locationStatus.isDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +92,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
 
-    // Notification Permission (Android 13+ / iOS)
     var notificationStatus = await Permission.notification.request();
     if (notificationStatus.isDenied) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,10 +100,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  /// 🔹 Show location bottom sheet
   void _showLocationBottomSheet() {
     showModalBottomSheet(
       context: context,
-      isDismissible: false, // bahar tap se close na ho
+      isDismissible: false,
       enableDrag: false,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
@@ -71,7 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context) {
         return WillPopScope(
           onWillPop: () async {
-            SystemNavigator.pop(); // back press -> app exit
+            SystemNavigator.pop();
             return false;
           },
           child: SafeArea(
@@ -129,6 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
+
   final Rxn<DateTime> _lastBackPressed = Rxn<DateTime>();
 
   Future<bool> _onWillPop() async {
@@ -157,16 +200,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
-    final statusBarHeight = mediaQuery.padding.top; // status bar ka height
+    final statusBarHeight = mediaQuery.padding.top;
 
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: AppColors.bgColor,
         body: Obx(
-              () => Column(
+          () => Column(
             children: [
-              /// Show AppBar only for index 0
               if (controller.selectedIndex.value == 0)
                 Container(
                   width: screenWidth,
@@ -191,7 +233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     color: AppColors.alertRed),
                                 SizedBox(width: screenWidth * 0.01),
                                 Text(
-                                  "Sector C",
+                                  "Your Location",
                                   style: GoogleFonts.nunito(
                                     fontSize: screenWidth * 0.045,
                                     fontWeight: FontWeight.w700,
@@ -201,7 +243,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ],
                             ),
                             Text(
-                              "569/153-GA, Kanpur Rd, adjacent...",
+                              currentAddress,
                               style: GoogleFonts.nunito(
                                 fontSize: screenWidth * 0.030,
                                 color: AppColors.darkGrey,
@@ -220,16 +262,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-      
-              /// Selected Screen
               Expanded(child: _screens[controller.selectedIndex.value]),
             ],
           ),
         ),
-      
-        /// Bottom Navigation Bar
         bottomNavigationBar: Obx(
-              () => BottomNavigationBar(
+          () => BottomNavigationBar(
             backgroundColor: AppColors.white,
             currentIndex: controller.selectedIndex.value,
             selectedItemColor: AppColors.primary,
@@ -239,28 +277,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
             unselectedFontSize: 12,
             iconSize: 24,
             onTap: controller.selectedIndex,
-            items:  [
-              BottomNavigationBarItem(
+            items: [
+              const BottomNavigationBarItem(
                 icon: Icon(LucideIcons.house),
                 label: "Home",
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(LucideIcons.search),
                 label: "Search",
               ),
               BottomNavigationBarItem(
                 icon: Obx(() {
+                  final itemCount = cartController.totalItems.value;
+                  final hasItems = itemCount > 0;
+                  print("🧾 Badge Update → totalItems: $itemCount | hasItems: $hasItems");
+
                   return Stack(
                     clipBehavior: Clip.none,
                     children: [
                       const Icon(LucideIcons.shoppingBag),
-                      if (cartController.totalItems.value > 0)
+                      if (hasItems)
                         Positioned(
                           right: -6,
                           top: -4,
                           child: Container(
                             padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
                             ),
@@ -269,7 +311,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               minHeight: 16,
                             ),
                             child: Text(
-                              "${cartController.totalItems.value}",
+                              itemCount.toString(),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
@@ -284,7 +326,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }),
                 label: "Cart",
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(LucideIcons.user),
                 label: "Account",
               ),

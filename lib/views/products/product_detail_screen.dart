@@ -81,6 +81,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           quantity: 1,
           price: basePrice,
           total: total,
+          weight: weightValue,
           status: "confirmed",
         ),
       ],
@@ -89,7 +90,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     await addToCartController.addToCart(request);
   }
 
-  void _updateCartTotal() {
+  void _updateCartTotal() { 
     if (selectedCutIndex.value != -1 && selectedWeightIndex.value != -1) {
       final cut = cuts[selectedCutIndex.value];
       final basePrice = cut["price"].toDouble();

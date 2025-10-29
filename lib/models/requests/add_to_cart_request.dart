@@ -15,6 +15,7 @@ class OrderItem {
   final int quantity;
   final double price;
   final double total;
+  final double weight;
   final String status;
 
   OrderItem({
@@ -22,6 +23,7 @@ class OrderItem {
     required this.quantity,
     required this.price,
     required this.total,
+    required this.weight,
     required this.status,
   });
 
@@ -31,6 +33,7 @@ class OrderItem {
       'quantity': quantity,
       'price': price,
       'total': total,
+      'weight': weight,
       'status': status,
     };
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
-import '../../widgets/custom_text_app_bar.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final Map<String, dynamic> orderData;

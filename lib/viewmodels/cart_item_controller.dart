@@ -14,28 +14,44 @@ class CartItemController extends GetxController {
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
 
-  /// Fetch cart items from API
+  final Map<int, RxBool> itemLoading = {};
+
+  void initItemLoaders() {
+    for (var item in cartItems) {
+      itemLoading[item.id] ??= false.obs;
+    }
+  }
+
   Future<void> fetchItems() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
+      print("🛒 Fetching cart items from API...");
+
       final response = await _repo.fetchcartItems();
 
-      if (response.success && response.cart != null) {
-        cartItems.assignAll(response.cart!);
-        updateTotals();
+      print("📦 Raw Cart API Response: ${response.toString()}");
+
+      if (response.success == true &&
+          response.cart != null &&
+          response.cart.isNotEmpty) {
+        cartItems.assignAll(response.cart);
+        print("✅ Cart items loaded → ${cartItems.length}");
       } else {
-        errorMessage.value = 'Failed to load cart items';
+        cartItems.clear();
+        print("⚠️ API says cart is empty");
       }
+
+      updateTotals();
     } catch (e) {
       errorMessage.value = 'Error: ${e.toString()}';
+      print("❌ Error fetching cart: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
-  /// Calculate total items and total price
   void updateTotals() {
     totalItems.value = cartItems.fold(
       0,
@@ -44,7 +60,11 @@ class CartItemController extends GetxController {
 
     totalPrice.value = cartItems.fold(
       0.0,
-      (sum, item) => sum + ((item.total ?? 0.0)),
+      (sum, item) => sum + (item.total ?? 0.0),
+    );
+
+    print(
+      "🧾 Badge Update → totalItems: ${totalItems.value} | hasItems: ${totalItems.value > 0}",
     );
   }
 }
