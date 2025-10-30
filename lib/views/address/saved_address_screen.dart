@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
-import '../../models/static responses/saved_address_response.dart';
+import '../../models/responses/saved_addresses_response.dart';
 import '../../roots/routes.dart';
-import '../../viewmodels/static data controllers/saved_address_controller.dart';
+import '../../viewmodels/saved_address_controller.dart';
+import '../../viewmodels/delete_address_controller.dart'; // ✅ ADD THIS
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SavedAddressController());
+    final SavedAddressController controller = Get.put(SavedAddressController());
+    final DeleteAddressController deleteController = Get.put(DeleteAddressController());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -21,28 +23,24 @@ class SavedAddressesScreen extends StatelessWidget {
           "Saved Addresses",
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.sp),
         ),
-
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 3.w),
             child: OutlinedButton(
+              onPressed: () async {
+                await Get.toNamed(AppRoutes.newAddress);
+                controller.fetchAddresses();
+              },
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.white, width: 1.2),
+                backgroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.white),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(25),
                 ),
-                minimumSize: Size(0, 4.h),
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                backgroundColor: AppColors.primary,
               ),
-              onPressed: () => Get.toNamed(AppRoutes.newAddress),
               child: Text(
                 "+ Add New",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.white,
-                ),
+                style: TextStyle(fontSize: 14.sp, color: Colors.white),
               ),
             ),
           ),
@@ -67,30 +65,55 @@ class SavedAddressesScreen extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
           itemCount: controller.addresses.length,
           itemBuilder: (_, index) {
-            return _addressCard(controller.addresses[index]);
+            final address = controller.addresses[index];
+
+            return GestureDetector(
+              onTap: () {
+                controller.selectAddress(address.id);
+                Navigator.pop(context, address);
+              },
+              child: Obx(
+                () => _addressCard(
+                  address,
+                  controller.selectedAddressId.value,
+                  deleteController,
+                  controller,
+                ),
+              ),
+            );
           },
         );
       }),
     );
   }
 
-  Widget _addressCard(AddressModel model) {
-    IconData icon = model.typeIcon == "home"
+  Widget _addressCard(
+    AddressModel model,
+    int? selectedId,
+    DeleteAddressController deleteController,
+    SavedAddressController savedController,
+  ) {
+    final bool isSelected = selectedId == model.id;
+    final isDeleting = deleteController.deletingId.value == model.id.toString();
+
+    IconData icon = model.addressType == "home"
         ? Icons.home_outlined
-        : model.typeIcon == "city"
+        : model.addressType == "work"
         ? Icons.location_city_outlined
         : Icons.location_on_outlined;
 
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
-      padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 2.w),
+      padding: EdgeInsets.all(2.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isSelected ? Colors.green.shade50 : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300, width: 0.7),
+        border: Border.all(
+          color: isSelected ? Colors.green : Colors.grey.shade300,
+          width: isSelected ? 1.6 : 0.7,
+        ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 18.sp, color: Colors.black87),
           SizedBox(width: 3.w),
@@ -104,15 +127,14 @@ class SavedAddressesScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 0.4.h),
+                SizedBox(height: 0.6.h),
                 Text(
-                  model.address,
+                  "${model.flat}, ${model.street}, ${model.building}, ${model.locality}, ${model.city}, ${model.state} - ${model.zip}",
                   style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 0.4.h),
+                SizedBox(height: 0.6.h),
                 Text(
                   model.phone,
                   style: TextStyle(fontSize: 14.sp, color: Colors.grey[700]),
@@ -121,7 +143,55 @@ class SavedAddressesScreen extends StatelessWidget {
             ),
           ),
 
-          Icon(Icons.more_vert, color: Colors.grey[600], size: 18.sp),
+          PopupMenuButton(
+            icon: isDeleting
+                ? SizedBox(
+                    width: 18.sp,
+                    height: 18.sp,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Icon(Icons.more_vert, size: 18.sp, color: Colors.grey[600]),
+            onSelected: (value) async {
+              if (value == "edit") {
+                final result = await Get.toNamed(
+                  AppRoutes.newAddress,
+                  arguments: model,
+                );
+                if (result == true) {
+                  savedController.fetchAddresses();
+                }
+              } else if (value == "delete") {
+                await deleteController.deleteAddress(model.id.toString());
+                savedController.addresses.remove(model);
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: "edit",
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, size: 18, color: AppColors.primary),
+                    SizedBox(width: 6),
+                    const Text("Edit"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: "delete",
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                    SizedBox(width: 6),
+                    const Text("Delete"),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

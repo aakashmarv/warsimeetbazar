@@ -3,14 +3,19 @@ import '../models/requests/update_address_request.dart';
 import '../models/responses/update_address_response.dart';
 import '../services/api_service.dart';
 
-class Updateaddressrepo {
+class UpdateAddressRepo {
   final _dio = ApiService.dio;
 
-  Future<UpdateAddressResponse> updateAddress(UpdateAddressRequest request) async {
+  Future<UpdateAddressResponse> updateAddress({
+    required String id,
+    required UpdateAddressRequest request,
+  }) async {
+    final url = "${ApiConstants.updateaddressUrl}/$id"; 
     final response = await _dio.post(
-      ApiConstants.updateaddressUrl(),
+      url,
       data: request.toJson(),
     );
+
     return UpdateAddressResponse.fromJson(response.data);
   }
 }

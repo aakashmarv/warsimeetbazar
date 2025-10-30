@@ -446,6 +446,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
 
       if (success) {
         controller.fetchAddresses();
+        await Future.delayed(const Duration(milliseconds: 900));
         Get.until((route) => Get.currentRoute == AppRoutes.savedaddresses);
       }
     } else {
@@ -471,6 +472,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
 
       if (_addressController.addNewAddressResponse?.status == true) {
         controller.fetchAddresses();
+        await Future.delayed(const Duration(milliseconds: 900));
         Get.until((route) => Get.currentRoute == AppRoutes.savedaddresses);
       }
     }

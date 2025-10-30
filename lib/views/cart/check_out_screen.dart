@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
+import '../../models/responses/saved_addresses_response.dart';
 import '../../viewmodels/placeorder_controller.dart';
 import '../../viewmodels/cart_item_controller.dart';
 
@@ -21,6 +22,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final PlaceOrderController orderController = Get.put(PlaceOrderController());
 
   final CartItemController cartItemController = Get.put(CartItemController());
+  AddressModel? selectedAddress;
 
   @override
   void initState() {
@@ -68,8 +70,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 1.h),
-
-              /// ✅ Delivery Address (Not Removed / Not Changed)
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
                 decoration: BoxDecoration(
@@ -94,7 +94,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           ),
                           SizedBox(height: 0.5.h),
                           Text(
-                            "John Doe, 221B Baker Street, Near Metro Station, Bengaluru, Karnataka - 560001",
+                            selectedAddress != null
+                                ? "${selectedAddress!.name}, ${selectedAddress!.flat}, ${selectedAddress!.street}, ${selectedAddress!.building}, ${selectedAddress!.locality}, ${selectedAddress!.city}, ${selectedAddress!.state} - ${selectedAddress!.zip}"
+                                : "Select delivery address",
                             style: TextStyle(
                               fontSize: 13.sp,
                               color: Colors.grey,
@@ -104,9 +106,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Get.toNamed(AppRoutes.newAddress);
+                      onPressed: () async {
+                        final selected = await Get.toNamed(
+                          AppRoutes.savedaddresses,
+                        );
+
+                        if (selected != null) {
+                          setState(() {
+                            selectedAddress =
+                                selected; // ✅ store selected address
+                          });
+                        }
                       },
+
                       child: Text(
                         "Change",
                         style: TextStyle(
@@ -205,8 +217,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   },
                 ),
               ),
-
-              /// ✅ Price Details Section
               Container(
                 padding: EdgeInsets.all(3.w),
                 margin: EdgeInsets.only(top: 1.h, bottom: 2.h),
@@ -234,8 +244,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         );
       }),
-
-      /// ✅ Place Order Button
       bottomNavigationBar: Obx(() {
         final tItems = totalItems();
         final total = totalAmount();
