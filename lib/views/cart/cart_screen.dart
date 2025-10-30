@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
 import '../../roots/routes.dart';
+import '../../utils/toast_util.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/increase_quantity_controller.dart';
 import '../../viewmodels/reduce_quantity_controller.dart';
@@ -21,17 +22,12 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // final CartController cartController = Get.put(CartController());
-  final CartItemController cartitemController = Get.put(CartItemController());
-  final RemoveCartItemController removeCartItemController = Get.put(
-    RemoveCartItemController(),
-  );
-  final ReduceQuantityController reduceQuantityController = Get.put(
-    ReduceQuantityController(),
-  );
-  final IncreaseQuantityController increaseQuantityController = Get.put(
-    IncreaseQuantityController(),
-  );
+
+  final CartItemController cartitemController = Get.find<CartItemController>();
+  final RemoveCartItemController removeCartItemController = Get.put(RemoveCartItemController(),);
+  final ReduceQuantityController reduceQuantityController = Get.put(ReduceQuantityController());
+  final IncreaseQuantityController increaseQuantityController = Get.put(IncreaseQuantityController());
+
   @override
   void initState() {
     super.initState();
@@ -193,8 +189,18 @@ class _CartScreenState extends State<CartScreen> {
                                       final id = item.id.toString();
                                       await removeCartItemController
                                           .removeCartItem(id);
-                                      cartitemController
-                                          .fetchItems(); // ✅ Only Refresh
+
+                                      if (removeCartItemController
+                                          .successMessage
+                                          .isNotEmpty) {
+                                        ToastUtil.showSuccess(removeCartItemController.successMessage.value);
+                                        cartitemController
+                                            .fetchItems();
+                                      } else if (removeCartItemController
+                                          .errorMessage
+                                          .isNotEmpty) {
+                                        ToastUtil.showError(removeCartItemController.errorMessage.value);
+                                      }
                                     },
                                     icon: const Icon(
                                       Icons.delete_outline,
@@ -209,10 +215,21 @@ class _CartScreenState extends State<CartScreen> {
                                       IconButton(
                                         onPressed: () async {
                                           await reduceQuantityController
-                                              .reduceQuantity(
-                                                item.id.toString(),
-                                              );
-                                          cartitemController.fetchItems();
+                                              .reduceQuantity(id);
+
+                                          if (reduceQuantityController
+                                              .isSuccess
+                                              .isTrue) {
+                                            ToastUtil.showSuccess(reduceQuantityController
+                                                .message
+                                                .value);
+                                            cartitemController
+                                                .fetchItems();
+                                          } else {
+                                            ToastUtil.showError(reduceQuantityController
+                                                .message
+                                                .value);
+                                          }
                                         },
 
                                         icon: const Icon(Icons.remove),
@@ -222,10 +239,21 @@ class _CartScreenState extends State<CartScreen> {
                                       IconButton(
                                         onPressed: () async {
                                           await increaseQuantityController
-                                              .increaseQuantity(
-                                                item.id.toString(),
-                                              );
-                                          cartitemController.fetchItems();
+                                              .increaseQuantity(id);
+
+                                          if (increaseQuantityController
+                                              .isSuccess
+                                              .isTrue) {
+                                            ToastUtil.showSuccess(increaseQuantityController
+                                                .message
+                                                .value);
+                                            cartitemController
+                                                .fetchItems();
+                                          } else {
+                                            ToastUtil.showError(increaseQuantityController
+                                                .message
+                                                .value);
+                                          }
                                         },
 
                                         icon: const Icon(Icons.add),
@@ -253,17 +281,6 @@ class _CartScreenState extends State<CartScreen> {
                 Get.toNamed(AppRoutes.Checkout);
               },
             ),
-
-            /// Checkout Bottom Bar
-            // FloatingCartBarWidget(
-            //   totalItems: cartController.cartItems.length,
-            //   totalPrice: cartController.cartItems.fold(
-            //     0.0,
-            //     (sum, item) => sum + (item.totalPrice ?? 0.0),
-            //   ),
-            //   buttonText: "Checkout",
-            //   onTap: () => Get.toNamed(AppRoutes.Checkout),
-            // ),
           ],
         );
       }),

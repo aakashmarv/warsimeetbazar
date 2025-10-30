@@ -36,6 +36,4 @@ class SnackbarUtil {
       reverseAnimationCurve: Curves.easeIn,
     );
   }
-
-
 }

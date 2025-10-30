@@ -9,7 +9,7 @@ class BestSellProductCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final String price;
-  final String productId; // ✅ Added this line
+  final String productId;
 
   const BestSellProductCard({
     Key? key,
@@ -17,7 +17,7 @@ class BestSellProductCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.price,
-    required this.productId, // ✅ Added this
+    required this.productId,
   }) : super(key: key);
 
   @override
@@ -37,6 +37,7 @@ class BestSellProductCard extends StatelessWidget {
           arguments: {
             'productName': title,
             'imageUrl': imageUrl,
+            'price': double.tryParse(price) ?? 0.0,
             'product_id': productId,
           },
         );
@@ -88,7 +89,7 @@ class BestSellProductCard extends StatelessWidget {
                   ),
                   SizedBox(height: h * 0.008),
                   Text(
-                    price,
+                    "₹$price",
                     style: GoogleFonts.nunito(
                       fontSize: w * 0.035,
                       fontWeight: FontWeight.bold,

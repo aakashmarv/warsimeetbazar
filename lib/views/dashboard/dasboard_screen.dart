@@ -1,16 +1,21 @@
+import 'dart:ui';
+import 'package:dry_fish/services/sharedpreferences_service.dart';
 import 'package:dry_fish/views/account/account_screen.dart';
 import 'package:dry_fish/views/cart/cart_screen.dart';
+import 'package:dry_fish/views/dashboard/widgets/cart_badge_icon.dart';
+import 'package:dry_fish/views/dashboard/widgets/dashboard_header.dart';
+import 'package:dry_fish/views/dashboard/widgets/location_bottom_sheet.dart';
 import 'package:dry_fish/views/search_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../Constants/app_colors.dart';
+import '../../constants/app_keys.dart';
+import '../../utils/logger.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/dashboard_controller.dart';
 import 'home_screen.dart';
@@ -23,17 +28,22 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardController controller = Get.put(DashboardController());
-  final CartItemController cartController = Get.put(CartItemController());
+  final DashboardController _dashboardController = Get.put(DashboardController());
+  final CartItemController _cartItemController = Get.put(CartItemController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String currentAddress = "Fetching your location...";
-  Position? currentPosition;
+  final RxBool isBottomSheetVisible = false.obs;
+  final RxBool _isLoadingCurrentLocation = false.obs;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
+  String currentAddress = "Fetching your location...";
+  String street = "Fetching street...";
+  Position? currentPosition;
+  final Rxn<DateTime> _lastBackPressed = Rxn<DateTime>();
+
+  final List<Widget> _screens = const [
+    HomeScreen(),
     SearchScreen(),
-    const CartScreen(showAppBar: false),
+    CartScreen(showAppBar: false),
     AccountScreen(),
   ];
 
@@ -42,49 +52,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _showLocationBottomSheet();
-      await _getCurrentLocation();
-      cartController.fetchItems();
+      _cartItemController.fetchItems();
     });
   }
 
-  /// 🔹 Get current location & convert to address
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        setState(() {
-          currentAddress = "Location permission denied";
-        });
-        return;
-      }
+  /// 🔹 Location Bottom Sheet
+  void _showLocationBottomSheet() {
+    isBottomSheetVisible.value = true;
 
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      setState(() {
-        currentPosition = position;
-      });
-
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
-        setState(() {
-          currentAddress =
-              "${place.street}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode},";
-        });
-        print(" your current address is == ${currentAddress}|| ${position.latitude} || ${position.longitude}");
-      }
-    } catch (e) {
-      setState(() {
-        currentAddress = "Error getting location: $e";
-      });
-    }
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => Obx(() => LocationBottomSheet(
+        isLoading: _isLoadingCurrentLocation.value,
+        onUseCurrentLocation: () async {
+          _isLoadingCurrentLocation.value = true;
+          await _requestPermissions();
+          await _getCurrentLocation();
+          _isLoadingCurrentLocation.value = false;
+          Navigator.pop(context);
+        },
+        onSelectManual: () {
+          Navigator.pop(context);
+          _requestPermissions();
+        },
+      )),
+    ).whenComplete(() {
+      isBottomSheetVisible.value = false;
+    });
   }
-
-  /// 🔹 Request app permissions
+  /// 🔹 Request permissions
   Future<void> _requestPermissions() async {
     var locationStatus = await Permission.locationWhenInUse.request();
     if (locationStatus.isDenied) {
@@ -100,89 +100,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
   }
+  /// 🔹 Get current location & convert to address
+  Future<void> _getCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        setState(() => currentAddress = "Location permission denied");
+        return;
+      }
 
-  /// 🔹 Show location bottom sheet
-  void _showLocationBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      enableDrag: false,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
-            SystemNavigator.pop();
-            return false;
-          },
-          child: SafeArea(
-            minimum: const EdgeInsets.only(bottom: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Set Your Location",
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _requestPermissions();
-                    },
-                    child: const Text("Use Current Location"),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      foregroundColor: AppColors.black,
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _requestPermissions();
-                    },
-                    child: const Text("Set on Map"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() => currentPosition = position);
+      appLog("📍 Current Position fetched successfully");
+      appLog("Latitude: ${position.latitude}");
+      appLog("Longitude: ${position.longitude}");
+      appLog("Accuracy: ${position.accuracy} meters");
+      appLog("Timestamp: ${position.timestamp}");
+
+      final prefs = await SharedPreferencesService.getInstance();
+      await prefs.setDouble(AppKeys.latitude, position.latitude);
+      await prefs.setDouble(AppKeys.longitude, position.longitude);
+      appLog("✅ Saved to SharedPreferences: lat=${position.latitude}, long=${position.longitude}");
+
+      final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        // Log each address component separately
+        appLog("🏠 Address Details ↓");
+        appLog("Street: ${place.street}");
+        appLog("SubLocality: ${place.subLocality}");
+        appLog("Locality: ${place.locality}");
+        appLog("SubAdministrativeArea: ${place.subAdministrativeArea}");
+        appLog("AdministrativeArea: ${place.administrativeArea}");
+        appLog("PostalCode: ${place.postalCode}");
+        appLog("Country: ${place.country}");
+        appLog("ISO Country Code: ${place.isoCountryCode}");
+        appLog("Name: ${place.name}");
+        appLog("Thoroughfare: ${place.thoroughfare}");
+        appLog("SubThoroughfare: ${place.subThoroughfare}");
+        setState(() {
+          final streetAddress = "${place.street}";
+          final formattedAddress = "${place.subLocality}, ${place.thoroughfare}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+
+          setState(() {
+            street = streetAddress;
+            currentAddress = formattedAddress;});
+        });
+      }
+    } catch (e) {
+      setState(() => currentAddress = "Error getting location: $e");
+    }
   }
-
-  final Rxn<DateTime> _lastBackPressed = Rxn<DateTime>();
-
+  /// 🔹 Handle back press
   Future<bool> _onWillPop() async {
     if (_scaffoldKey.currentState?.isDrawerOpen == true) {
       Navigator.of(context).pop();
       return false;
     }
 
-    if (controller.selectedIndex.value != 0) {
-      controller.changeTab(0);
+    if (_dashboardController.selectedIndex.value != 0) {
+      _dashboardController.changeTab(0);
       return false;
     }
 
@@ -206,134 +186,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: AppColors.bgColor,
-        body: Obx(
-          () => Column(
-            children: [
-              if (controller.selectedIndex.value == 0)
-                Container(
-                  width: screenWidth,
-                  padding: EdgeInsets.only(
-                    top: statusBarHeight + 8,
-                    left: screenWidth * 0.04,
-                    right: screenWidth * 0.04,
-                    bottom: screenHeight * 0.012,
+        body: Stack(
+          children: [
+            Obx(() => Column(
+              children: [
+                if (_dashboardController.selectedIndex.value == 0)
+                  DashboardHeader(
+                    address: currentAddress,
+                    street: street,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight,
+                    statusBarHeight: statusBarHeight,
                   ),
-                  color: AppColors.white,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on,
-                                    color: AppColors.alertRed),
-                                SizedBox(width: screenWidth * 0.01),
-                                Text(
-                                  "Your Location",
-                                  style: GoogleFonts.nunito(
-                                    fontSize: screenWidth * 0.045,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              currentAddress,
-                              style: GoogleFonts.nunito(
-                                fontSize: screenWidth * 0.030,
-                                color: AppColors.darkGrey,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Image.asset(
-                        "assets/images/logo_cb_black.png",
-                        height: screenWidth * 0.10,
-                        width: screenWidth * 0.18,
-                        fit: BoxFit.cover,
-                      ),
-                    ],
-                  ),
+                Expanded(
+                  child: _screens[_dashboardController.selectedIndex.value],
                 ),
-              Expanded(child: _screens[controller.selectedIndex.value]),
-            ],
-          ),
+              ],
+            )),
+            Obx(() => isBottomSheetVisible.value
+                ? BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(color: Colors.black.withOpacity(0.1)),
+            )
+                : const SizedBox.shrink()),
+          ],
         ),
-        bottomNavigationBar: Obx(
-          () => BottomNavigationBar(
-            backgroundColor: AppColors.white,
-            currentIndex: controller.selectedIndex.value,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: AppColors.darkGrey,
-            type: BottomNavigationBarType.fixed,
-            selectedFontSize: 14,
-            unselectedFontSize: 12,
-            iconSize: 24,
-            onTap: controller.selectedIndex,
-            items: [
-              const BottomNavigationBarItem(
-                icon: Icon(LucideIcons.house),
-                label: "Home",
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(LucideIcons.search),
-                label: "Search",
-              ),
-              BottomNavigationBarItem(
-                icon: Obx(() {
-                  final itemCount = cartController.totalItems.value;
-                  final hasItems = itemCount > 0;
-                  print("🧾 Badge Update → totalItems: $itemCount | hasItems: $hasItems");
-
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      const Icon(LucideIcons.shoppingBag),
-                      if (hasItems)
-                        Positioned(
-                          right: -6,
-                          top: -4,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: const BoxConstraints(
-                              minWidth: 16,
-                              minHeight: 16,
-                            ),
-                            child: Text(
-                              itemCount.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                }),
-                label: "Cart",
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(LucideIcons.user),
-                label: "Account",
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: Obx(() => BottomNavigationBar(
+          backgroundColor: AppColors.white,
+          currentIndex: _dashboardController.selectedIndex.value,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.darkGrey,
+          type: BottomNavigationBarType.fixed,
+          selectedFontSize: 14,
+          unselectedFontSize: 12,
+          iconSize: 24,
+          onTap: _dashboardController.selectedIndex,
+          items: [
+            const BottomNavigationBarItem(
+              icon: Icon(LucideIcons.house),
+              label: "Home",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(LucideIcons.search),
+              label: "Search",
+            ),
+            BottomNavigationBarItem(
+              icon: CartBadgeIcon(controller: _cartItemController),
+              label: "Cart",
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(LucideIcons.user),
+              label: "Account",
+            ),
+          ],
+        )),
       ),
     );
   }
