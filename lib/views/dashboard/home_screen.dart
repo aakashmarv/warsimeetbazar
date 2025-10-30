@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             title: product.name ?? "",
                             subtitle: product.description ?? "",
                             imageUrl: imageUrl,
-                            price: "₹${product.price ?? '0'}",
+                            price: "${product.price ?? '0'}",
                             productId: product.id.toString(),
                           );
                         },

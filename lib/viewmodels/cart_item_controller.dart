@@ -26,18 +26,11 @@ class CartItemController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-
-      print("🛒 Fetching cart items from API...");
-
       final response = await _repo.fetchcartItems();
 
-      print("📦 Raw Cart API Response: ${response.toString()}");
-
       if (response.success == true &&
-          response.cart != null &&
           response.cart.isNotEmpty) {
         cartItems.assignAll(response.cart);
-        print("✅ Cart items loaded → ${cartItems.length}");
       } else {
         cartItems.clear();
         print("⚠️ API says cart is empty");
@@ -61,10 +54,6 @@ class CartItemController extends GetxController {
     totalPrice.value = cartItems.fold(
       0.0,
       (sum, item) => sum + (item.total ?? 0.0),
-    );
-
-    print(
-      "🧾 Badge Update → totalItems: ${totalItems.value} | hasItems: ${totalItems.value > 0}",
     );
   }
 }

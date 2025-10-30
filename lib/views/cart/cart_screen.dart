@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
 import '../../roots/routes.dart';
+import '../../utils/toast_util.dart';
 import '../../viewmodels/cart_item_controller.dart';
 import '../../viewmodels/increase_quantity_controller.dart';
 import '../../viewmodels/reduce_quantity_controller.dart';
@@ -21,15 +22,12 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // final CartController cartController = Get.put(CartController());
-  final CartItemController cartitemController = Get.put(CartItemController());
-  final RemoveCartItemController removeCartItemController = Get.put(
-    RemoveCartItemController(),
-  );
-final ReduceQuantityController reduceQuantityController =
-    Get.put(ReduceQuantityController());
-final IncreaseQuantityController increaseQuantityController =
-    Get.put(IncreaseQuantityController());
+
+  final CartItemController cartitemController = Get.find<CartItemController>();
+  final RemoveCartItemController removeCartItemController = Get.put(RemoveCartItemController(),);
+  final ReduceQuantityController reduceQuantityController = Get.put(ReduceQuantityController());
+  final IncreaseQuantityController increaseQuantityController = Get.put(IncreaseQuantityController());
+
   @override
   void initState() {
     super.initState();
@@ -200,23 +198,13 @@ final IncreaseQuantityController increaseQuantityController =
                                       if (removeCartItemController
                                           .successMessage
                                           .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Success',
-                                          removeCartItemController
-                                              .successMessage
-                                              .value,
-                                        );
+                                        ToastUtil.showSuccess(removeCartItemController.successMessage.value);
                                         cartitemController
                                             .fetchItems();
                                       } else if (removeCartItemController
                                           .errorMessage
                                           .isNotEmpty) {
-                                        Get.snackbar(
-                                          'Error',
-                                          removeCartItemController
-                                              .errorMessage
-                                              .value,
-                                        );
+                                        ToastUtil.showError(removeCartItemController.errorMessage.value);
                                       }
                                     },
                                     icon: const Icon(
@@ -239,21 +227,15 @@ final IncreaseQuantityController increaseQuantityController =
                                           if (reduceQuantityController
                                               .isSuccess
                                               .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
+                                            ToastUtil.showSuccess(reduceQuantityController
+                                                .message
+                                                .value);
                                             cartitemController
                                                 .fetchItems();
                                           } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              reduceQuantityController
-                                                  .message
-                                                  .value,
-                                            );
+                                            ToastUtil.showError(reduceQuantityController
+                                                .message
+                                                .value);
                                           }
                                         },
                                         icon: const Icon(Icons.remove),
@@ -269,21 +251,15 @@ final IncreaseQuantityController increaseQuantityController =
                                           if (increaseQuantityController
                                               .isSuccess
                                               .isTrue) {
-                                            Get.snackbar(
-                                              'Success',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
+                                            ToastUtil.showSuccess(increaseQuantityController
+                                                .message
+                                                .value);
                                             cartitemController
                                                 .fetchItems();
                                           } else {
-                                            Get.snackbar(
-                                              'Error',
-                                              increaseQuantityController
-                                                  .message
-                                                  .value,
-                                            );
+                                            ToastUtil.showError(increaseQuantityController
+                                                .message
+                                                .value);
                                           }
                                         },
                                         icon: const Icon(Icons.add),
@@ -313,17 +289,6 @@ final IncreaseQuantityController increaseQuantityController =
                 Get.toNamed(AppRoutes.Checkout);
               },
             ),
-
-            /// Checkout Bottom Bar
-            // FloatingCartBarWidget(
-            //   totalItems: cartController.cartItems.length,
-            //   totalPrice: cartController.cartItems.fold(
-            //     0.0,
-            //     (sum, item) => sum + (item.totalPrice ?? 0.0),
-            //   ),
-            //   buttonText: "Checkout",
-            //   onTap: () => Get.toNamed(AppRoutes.Checkout),
-            // ),
           ],
         );
       }),

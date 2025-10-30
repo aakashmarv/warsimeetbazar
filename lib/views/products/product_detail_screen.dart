@@ -1,3 +1,4 @@
+import 'package:dry_fish/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -21,9 +22,9 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with TickerProviderStateMixin {
+
   final CartItemController cartController = Get.put(CartItemController());
-  final AddToCartController addToCartController =
-      Get.put(AddToCartController(repository: AddtocartRepository()));
+  final AddToCartController addToCartController = Get.put(AddToCartController(repository: AddtocartRepository()));
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -36,11 +37,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   late String productName;
   late String imageUrl;
   late int productId;
+  late double price;
 
-  static const List<Map<String, dynamic>> cuts = [
-    {"name": "Fry Cut", "price": 450, "image": "assets/images/banner2.jpg", "mrp": 500},
-    {"name": "Curry Cut", "price": 600, "image": "assets/images/banner2.jpg", "mrp": 750},
-  ];
+  List<Map<String, dynamic>> cuts = [];
 
   static const List<String> weights = [
     "0.25 kg", "0.5 kg", "1 kg", "1.5 kg", "2 kg", "2.5 kg",
@@ -52,7 +51,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     final args = Get.arguments ?? {};
     productName = args['productName'] ?? 'Unknown Product';
     imageUrl = args['imageUrl'] ?? '';
+    price = (args['price'] is double)
+        ? args['price']
+        : double.tryParse(args['price'].toString()) ?? 0.0;
+    appLog(" aakshdhfk :: ${price}");
     productId = int.tryParse(args['product_id'].toString()) ?? 0;
+    cuts = [
+      {"name": "Fry Cut", "price": price, "image": "assets/images/banner2.jpg"},
+      {"name": "Curry Cut", "price": price, "image": "assets/images/banner2.jpg"},
+    ];
 
     _animationController =
         AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
@@ -70,9 +77,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Future<void> _triggerAddToCart() async {
     final cut = cuts[selectedCutIndex.value];
     final weight = weights[selectedWeightIndex.value];
-    final basePrice = cut["price"].toDouble();
-    final weightValue = double.parse(weight.split(" ")[0]);
-    final total = basePrice * weightValue;
+    final basePrice = double.tryParse(cut["price"].toString()) ?? 0.0;
+    final weightValue = double.tryParse(weight.split(" ")[0]) ?? 0.0;
 
     final request = AddToCartRequest(
       items: [
@@ -80,8 +86,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           productId: productId,
           quantity: 1,
           price: basePrice,
-          total: total,
           weight: weightValue,
+          cuttingType: cut["name"],
           status: "confirmed",
         ),
       ],
@@ -382,7 +388,7 @@ class _CutCard extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(2.5.w),
+              padding: EdgeInsets.all(2.3.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -392,20 +398,19 @@ class _CutCard extends StatelessWidget {
                           fontSize: 16.sp,
                           color: const Color(0xFF1E293B))),
                   SizedBox(height: 1.h),
-                  Row(
+                  Column(
                     children: [
-                      Text("₹${cut["price"]}",
+                      Text("${cut["price"]}",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16.sp,
                               color: AppColors.black)),
-                      SizedBox(width: 1.5.w),
-                      if (cut["mrp"] != null)
-                        Text("₹${cut["mrp"]}",
-                            style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.grey[500],
-                                decoration: TextDecoration.lineThrough)),
+                      // if (cut["mrp"] != null)
+                      //   Text("₹${cut["mrp"]}",
+                      //       style: TextStyle(
+                      //           fontSize: 14.sp,
+                      //           color: Colors.grey[500],
+                      //           decoration: TextDecoration.lineThrough)),
                     ],
                   ),
                 ],
