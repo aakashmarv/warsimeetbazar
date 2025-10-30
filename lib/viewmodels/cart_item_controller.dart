@@ -4,13 +4,9 @@ import '../../repositories/cart_repository.dart';
 
 class CartItemController extends GetxController {
   final _repo = CartItemRepo();
-
-  /// Observables
   final isLoading = false.obs;
   final errorMessage = ''.obs;
   final cartItems = <CartItem>[].obs;
-
-  /// Totals
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
 
@@ -34,7 +30,6 @@ class CartItemController extends GetxController {
       print("📦 Raw Cart API Response: ${response.toString()}");
 
       if (response.success == true &&
-          response.cart != null &&
           response.cart.isNotEmpty) {
         cartItems.assignAll(response.cart);
         print("✅ Cart items loaded → ${cartItems.length}");
@@ -55,12 +50,12 @@ class CartItemController extends GetxController {
   void updateTotals() {
     totalItems.value = cartItems.fold(
       0,
-      (sum, item) => sum + (item.quantity ?? 0),
+      (sum, item) => sum + (item.quantity),
     );
 
     totalPrice.value = cartItems.fold(
       0.0,
-      (sum, item) => sum + (item.total ?? 0.0),
+      (sum, item) => sum + (item.total),
     );
 
     print(
