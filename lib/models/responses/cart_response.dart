@@ -1,67 +1,71 @@
-class CartResponseModel {
-  final bool success;
-  final List<CartItem> cart;
+class CartResponse {
+  final List<CartItem>? cart;
+  final bool? success;
 
-  CartResponseModel({
-    required this.success,
-    required this.cart,
-  });
+  CartResponse({this.cart, this.success});
 
-  factory CartResponseModel.fromJson(Map<String, dynamic> json) {
-    return CartResponseModel(
+  factory CartResponse.fromJson(Map<String, dynamic> json) {
+    return CartResponse(
+      cart: (json['cart'] as List?)
+          ?.map((item) => CartItem.fromJson(item))
+          .toList(),
       success: json['success'] ?? false,
-      cart: (json['cart'] as List<dynamic>?)
-              ?.map((e) => CartItem.fromJson(e))
-              .toList() ??
-          [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'cart': cart?.map((item) => item.toJson()).toList(),
       'success': success,
-      'cart': cart.map((e) => e.toJson()).toList(),
     };
   }
 }
 
 class CartItem {
-  final int id;
-  final int userId;
-  final int productId;
-   int quantity;
-  final double price;
-  final double total;
-  final String status;
-  final String createdAt;
-  final String updatedAt;
-  final Product product;
+  final int? id;
+  final int? userId;
+  final int? productId;
+  final int? quantity;
+  final double? price;
+  final String? cuttingType;
+  final double? weight;
+  final double? total;
+  final String? status;
+  final String? createdAt;
+  final String? updatedAt;
+  final Product? product;
 
   CartItem({
-    required this.id,
-    required this.userId,
-    required this.productId,
-    required this.quantity,
-    required this.price,
-    required this.total,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.product,
+    this.id,
+    this.userId,
+    this.productId,
+    this.quantity,
+    this.price,
+    this.cuttingType,
+    this.weight,
+    this.total,
+    this.status,
+    this.createdAt,
+    this.updatedAt,
+    this.product,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
-      id: json['id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      productId: json['product_id'] ?? 0,
-      quantity: json['quantity'] ?? 0,
-      price: double.tryParse(json['price'].toString()) ?? 0.0,
-      total: double.tryParse(json['total'].toString()) ?? 0.0,
-      status: json['status'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      product: Product.fromJson(json['product'] ?? {}),
+      id: json['id'],
+      userId: json['user_id'],
+      productId: json['product_id'],
+      quantity: json['quantity'],
+      price: _toDouble(json['price']),
+      cuttingType: json['cutting_type'],
+      weight: _toDouble(json['weight']),
+      total: _toDouble(json['total']),
+      status: json['status'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+      product: json['product'] != null
+          ? Product.fromJson(json['product'])
+          : null,
     );
   }
 
@@ -72,55 +76,57 @@ class CartItem {
       'product_id': productId,
       'quantity': quantity,
       'price': price,
+      'cutting_type': cuttingType,
+      'weight': weight,
       'total': total,
       'status': status,
       'created_at': createdAt,
       'updated_at': updatedAt,
-      'product': product.toJson(),
+      'product': product?.toJson(),
     };
   }
 }
 
 class Product {
-  final int id;
-  final int categoryId;
-  final int subCategoryId;
-  final String name;
-  final String description;
-  final String price;
-  final String image;
+  final int? id;
+  final int? categoryId;
+  final int? subCategoryId;
+  final String? name;
+  final String? description;
+  final double? price;
+  final String? image;
   final String? weight;
-  final int stock;
-  final String createdAt;
-  final String updatedAt;
+  final int? stock;
+  final String? createdAt;
+  final String? updatedAt;
 
   Product({
-    required this.id,
-    required this.categoryId,
-    required this.subCategoryId,
-    required this.name,
-    required this.description,
-    required this.price,
-    required this.image,
+    this.id,
+    this.categoryId,
+    this.subCategoryId,
+    this.name,
+    this.description,
+    this.price,
+    this.image,
     this.weight,
-    required this.stock,
-    required this.createdAt,
-    required this.updatedAt,
+    this.stock,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? 0,
-      categoryId: json['category_id'] ?? 0,
-      subCategoryId: json['sub_category_id'] ?? 0,
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-      price: json['price'] ?? '0',
-      image: json['image'] ?? '',
-      weight: json['weight'],
-      stock: json['stock'] ?? 0,
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
+      id: json['id'],
+      categoryId: json['category_id'],
+      subCategoryId: json['sub_category_id'],
+      name: json['name'],
+      description: json['description'],
+      price: _toDouble(json['price']),
+      image: json['image'],
+      weight: json['weight']?.toString(),
+      stock: json['stock'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
     );
   }
 
@@ -139,4 +145,13 @@ class Product {
       'updated_at': updatedAt,
     };
   }
+}
+
+/// ✅ Helper to safely convert dynamic to double
+double? _toDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
 }

@@ -32,12 +32,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   double get subtotal =>
-      cartController.cartItems.fold(0, (sum, item) => sum + item.total);
+      cartController.cartItems.fold(0.0, (sum, item) => sum + (item.total ?? 0.0));
 
   double get totalAmount => subtotal + shippingFee + handlingFee;
 
   int get totalItems =>
-      cartController.cartItems.fold(0, (sum, item) => sum + item.quantity);
+      cartController.cartItems.fold(0, (sum, item) => sum + (item.quantity ?? 0));
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +96,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             Divider(height: 1, color: Colors.grey[300]),
                         itemBuilder: (_, i) {
                           final item = items[i];
-                          final imageUrl = item.product.image.isNotEmpty
-                              ? "${ApiConstants.imageBaseUrl}${item.product.image}"
+                          final imageUrl = (item.product?.image?.isNotEmpty ?? false)
+                              ? "${ApiConstants.imageBaseUrl}${item.product?.image}"
                               : "assets/images/banner2.jpg";
+
 
                           return Padding(
                             padding: EdgeInsets.symmetric(vertical: 1.5.h),
@@ -122,7 +123,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        item.product.name,
+                                        item.product?.name ?? '',
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -132,7 +133,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       ),
                                       SizedBox(height: 0.5.h),
                                       Text(
-                                        "${item.product.name} | ${item.product.weight}",
+                                        "${item.product?.name ?? ''} | ${item.product?.weight ?? ''}",
                                         style: TextStyle(
                                           fontSize: 12.sp,
                                           color: Colors.grey[600],
@@ -151,7 +152,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                             ),
                                           ),
                                           Text(
-                                            "₹${item.total.toStringAsFixed(0)}",
+                                            "₹${(item.total ?? 0.0).toStringAsFixed(0)}",
                                             style: TextStyle(
                                               fontSize: 15.sp,
                                               fontWeight: FontWeight.w600,
