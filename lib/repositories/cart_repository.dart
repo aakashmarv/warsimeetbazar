@@ -7,9 +7,9 @@ import '../services/api_service.dart';
 class CartItemRepo {
   final _dio = ApiService.dio;
 
-  Future<CartResponse> fetchcartItems() async {
+  Future<CartResponseModel> fetchcartItems() async {
     final response = await _dio.get(ApiConstants.cartUrl);
 
-    return CartResponse.fromJson(response.data);
+    return CartResponseModel.fromJson(response.data);
   }
 }

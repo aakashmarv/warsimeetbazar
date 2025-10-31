@@ -18,10 +18,8 @@ class CartItemController extends GetxController {
 
   void initItemLoaders() {
     for (var item in cartItems) {
-      if (item.id != null) {
-        itemLoading[item.id!] ??= false.obs;
-      }
-    }
+      itemLoading[item.id] ??= false.obs;
+        }
   }
 
   Future<void> fetchItems() async {
