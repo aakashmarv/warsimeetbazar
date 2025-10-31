@@ -1,4 +1,4 @@
-class UpdateAddressRequest {
+class AddNewAddressRequest {
   final String name;
   final String phone;
   final String flat;
@@ -13,7 +13,7 @@ class UpdateAddressRequest {
   final String addressType;
   final bool isSelected;
 
-  UpdateAddressRequest({
+  AddNewAddressRequest({
     required this.name,
     required this.phone,
     required this.flat,

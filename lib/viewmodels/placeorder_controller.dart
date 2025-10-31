@@ -13,7 +13,7 @@ class PlaceOrderController extends GetxController {
   Future<void> placeOrderCont(PlaceOrderRequest request) async {
     isLoading.value = true;
     try {
-      final response = await _repository.placeOrder(request);
+      final response = await _repository.placeOrder();
 
       if (response.status?.toLowerCase() == "success") {
         order.value = response.order;

@@ -1,4 +1,5 @@
 import 'package:dry_fish/views/address/new_address_screen.dart';
+import 'package:dry_fish/views/address/saved_address_screen.dart';
 import 'package:dry_fish/views/auth/login_screen.dart';
 import 'package:dry_fish/views/auth/otp_verification_screen.dart';
 import 'package:dry_fish/views/cart/cart_screen.dart';
@@ -31,6 +32,7 @@ class AppRoutes {
   static const contact = '/contact';
   static const productScreen = '/productScreen';
   static const productDetail = '/productDetail';
+  static const savedaddresses = '/savedaddresses';
 
   static const _defaultTransition = Transition.cupertino;
   static const _transitionDuration = Duration(milliseconds: 500);
@@ -64,6 +66,7 @@ class AppRoutes {
       _buildPage(name: contact, page: () => ContactUsScreen()),
       _buildPage(name: productScreen, page: () => ProductListScreen()),
       _buildPage(name: productDetail, page: () => ProductDetailScreen()),
+      _buildPage(name: savedaddresses, page: () => SavedAddressesScreen())
 
     ];
   }

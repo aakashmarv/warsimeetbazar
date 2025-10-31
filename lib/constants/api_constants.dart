@@ -12,9 +12,13 @@ class ApiConstants {
   static String removefromcarturl = "$baseUrl/user/removefromcart";
   static String reducequantityurl = "$baseUrl/user/reduceqty";
   static String increasequantityurl = "$baseUrl/user/increaseqty";
+  static String orderListUrl = "$baseUrl/user/orders";
+  static String addnewaddressurl = "$baseUrl/user/addaddress";
+  static String savedAddressesUrl = "$baseUrl/user/addresses";
+  static String deleteaddressurl = "$baseUrl/user/deleteaddress";
+  static String updateaddressUrl = "$baseUrl/user/editaddress";
 
   static String productByCategoryUrl(int categoryId) =>
       "$baseUrl/products/categories/$categoryId";
   static String productsUrl() => "$baseUrl/products";
-  static String updateaddressUrl() => "$baseUrl/user/updateaddress";
 }

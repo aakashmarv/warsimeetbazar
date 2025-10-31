@@ -7,7 +7,6 @@
 // import '../../Constants/app_colors.dart';
 // import '../../widgets/custom_text_app_bar.dart';
 
-
 // class AccountScreen extends StatefulWidget {
 //   const AccountScreen({super.key});
 
@@ -211,7 +210,7 @@
 //             ),
 //             TextButton(
 //               onPressed: () {
-//                 Navigator.of(context).pop(); 
+//                 Navigator.of(context).pop();
 //               },
 //               child: const Text(
 //                 "Logout",
@@ -280,9 +279,6 @@
 //     );
 //   }
 // }
-
-
-
 
 import 'dart:convert';
 import 'package:dry_fish/roots/routes.dart';
@@ -382,52 +378,73 @@ class _AccountScreenState extends State<AccountScreen> {
               SizedBox(height: 3.h),
 
               _buildMenuItem(
-                  icon: Icons.shopping_cart_outlined,
-                  title: "Orders",
-                  subtitle: "Check your order status",
-                  onTap: () => Get.toNamed(AppRoutes.order)),
+                icon: Icons.shopping_cart_outlined,
+                title: "Orders",
+                subtitle: "Check your order status",
+                onTap: () => Get.toNamed(AppRoutes.order),
+              ),
               _buildMenuItem(
-                  icon: Icons.card_giftcard,
-                  title: "Earn Rewards",
-                  subtitle: "Invite friends and earn rewards"),
+                icon: Icons.card_giftcard,
+                title: "Earn Rewards",
+                subtitle: "Invite friends and earn rewards",
+              ),
               _buildMenuItem(
-                  icon: Icons.phone_outlined,
-                  title: "Contact Us",
-                  subtitle: "Help regarding your recent purchase",
-                  onTap: () => Get.toNamed(AppRoutes.contact)),
+                icon: Icons.phone_outlined,
+                title: "Contact Us",
+                subtitle: "Help regarding your recent purchase",
+                onTap: () => Get.toNamed(AppRoutes.contact),
+              ),
               _buildMenuItem(
-                  icon: Icons.description_outlined,
-                  title: "Terms & Conditions",
-                  subtitle: "",
-                  onTap: () {
-                    _launchURL("https://www.termsfeed.com/blog/privacy-policy-url/");
-                  }),
+                icon: Icons.location_on_outlined,
+                title: "Saved Addresses",
+                subtitle: "Manage your delivery addresses",
+                onTap: () =>
+                    Get.toNamed(AppRoutes.savedaddresses), // << route yaha aapka hoga
+              ),
+
               _buildMenuItem(
-                  icon: Icons.policy_outlined,
-                  title: "Privacy Policy",
-                  subtitle: "",
-                  onTap: () {
-                    _launchURL("https://www.termsfeed.com/blog/privacy-policy-url/");
-                  }),
+                icon: Icons.description_outlined,
+                title: "Terms & Conditions",
+                subtitle: "",
+                onTap: () {
+                  _launchURL(
+                    "https://www.termsfeed.com/blog/privacy-policy-url/",
+                  );
+                },
+              ),
               _buildMenuItem(
-                  icon: Icons.store_outlined,
-                  title: "Seller Information",
-                  subtitle: ""),
+                icon: Icons.policy_outlined,
+                title: "Privacy Policy",
+                subtitle: "",
+                onTap: () {
+                  _launchURL(
+                    "https://www.termsfeed.com/blog/privacy-policy-url/",
+                  );
+                },
+              ),
               _buildMenuItem(
-                  icon: Icons.lock_outline,
-                  title: "Account Privacy",
-                  subtitle: ""),
+                icon: Icons.store_outlined,
+                title: "Seller Information",
+                subtitle: "",
+              ),
               _buildMenuItem(
-                  icon: Icons.notifications_active_outlined,
-                  title: "Notification Preferences",
-                  subtitle: ""),
+                icon: Icons.lock_outline,
+                title: "Account Privacy",
+                subtitle: "",
+              ),
               _buildMenuItem(
-                  icon: Icons.logout,
-                  title: "Logout",
-                  subtitle: "",
-                  onTap: () {
-                    _showLogoutDialog(context);
-                  }),
+                icon: Icons.notifications_active_outlined,
+                title: "Notification Preferences",
+                subtitle: "",
+              ),
+              _buildMenuItem(
+                icon: Icons.logout,
+                title: "Logout",
+                subtitle: "",
+                onTap: () {
+                  _showLogoutDialog(context);
+                },
+              ),
 
               SizedBox(height: 5.h),
 
@@ -440,11 +457,13 @@ class _AccountScreenState extends State<AccountScreen> {
                         style: GoogleFonts.nunito(fontSize: 20.sp),
                         children: [
                           TextSpan(
-                              text: "CHAVAN ",
-                              style: const TextStyle(color: AppColors.black)),
+                            text: "CHAVAN ",
+                            style: const TextStyle(color: AppColors.black),
+                          ),
                           TextSpan(
-                              text: "BROTHER'S",
-                              style: TextStyle(color: AppColors.primary)),
+                            text: "BROTHER'S",
+                            style: TextStyle(color: AppColors.primary),
+                          ),
                         ],
                       ),
                     ),
@@ -481,8 +500,13 @@ class _AccountScreenState extends State<AccountScreen> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: const Text("Logout", style: TextStyle(fontWeight: FontWeight.bold)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text(
+            "Logout",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: const Text("Are you sure you want to logout?"),
           actions: [
             TextButton(
@@ -499,7 +523,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 print("👋 User logged out from AccountScreen");
                 Get.offAllNamed(AppRoutes.login);
               },
-              child: const Text("Logout", style: TextStyle(color: AppColors.primary)),
+              child: const Text(
+                "Logout",
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
           ],
         );
@@ -522,28 +549,42 @@ class _AccountScreenState extends State<AccountScreen> {
             padding: EdgeInsets.only(left: 5.w),
             child: Icon(icon, color: AppColors.primary, size: 20.sp),
           ),
-          title: Text(title,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
+          title: Text(
+            title,
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+          ),
           subtitle: subtitle.isNotEmpty
-              ? Text(subtitle,
-                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]))
+              ? Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                )
               : null,
           trailing: trailing != null
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.monetization_on,
-                        color: Colors.amber, size: 14.sp),
+                    Icon(
+                      Icons.monetization_on,
+                      color: Colors.amber,
+                      size: 14.sp,
+                    ),
                     SizedBox(width: 1.w),
-                    Text(trailing,
-                        style: TextStyle(
-                            fontSize: 14.sp, fontWeight: FontWeight.w600)),
+                    Text(
+                      trailing,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 )
               : Padding(
                   padding: EdgeInsets.only(right: 5.w),
-                  child: Icon(Icons.chevron_right,
-                      color: AppColors.darkGrey, size: 18.sp),
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: AppColors.darkGrey,
+                    size: 18.sp,
+                  ),
                 ),
           onTap: onTap,
         ),

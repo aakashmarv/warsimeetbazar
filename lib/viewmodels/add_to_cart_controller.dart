@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../models/requests/add_to_cart_request.dart';
 import '../../models/responses/add_to_cart_response.dart';
 import '../../repositories/addtocart_repository.dart';
+import '../../utils/snackbar_util.dart'; // ✅ Make sure path is correct
 
 class AddToCartController extends GetxController {
   final AddtocartRepository repository;
@@ -21,13 +22,13 @@ class AddToCartController extends GetxController {
       response.value = result;
 
       if (result.status) {
-        Get.snackbar('Success', result.message);
+        SnackbarUtil.showSuccess('Success', result.message);  // ✅ Success Snackbar
       } else {
-        Get.snackbar('Failed', result.message);
+        SnackbarUtil.showError('Failed', result.message);      // ❌ Failure Snackbar
       }
     } catch (e) {
       errorMessage.value = e.toString();
-      Get.snackbar('Error', errorMessage.value);
+      SnackbarUtil.showError('Error', errorMessage.value);     // ❌ Error Snackbar
     } finally {
       isLoading.value = false;
     }
