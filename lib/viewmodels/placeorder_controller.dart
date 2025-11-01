@@ -17,10 +17,10 @@ class PlaceOrderController extends GetxController {
 
       if (response.status?.toLowerCase() == "success") {
         order.value = response.order;
-        SnackbarUtil.showSuccess("Order Placed",
-          response.message ?? "Your order has been placed successfully!",
+        Get.offAllNamed(
+          AppRoutes.orderConfirmer,
+          arguments: response.order,
         );
-        Get.offAllNamed(AppRoutes.orderConfirmer);
       } else {
         SnackbarUtil.showError(
           "Order Failed",

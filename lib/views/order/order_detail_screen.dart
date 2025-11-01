@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
-import '../../models/responses/order_list_response.dart';
+import '../../models/responses/order_history_response.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final Order order;
