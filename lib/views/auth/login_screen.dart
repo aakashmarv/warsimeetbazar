@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import 'package:flutter/services.dart';
 import '../../viewmodels/login_controller.dart';
@@ -288,15 +289,15 @@ class LoginScreen extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Image.asset(
-                        'assets/images/applogo.png',
-                        width: 80,
-                        height: 80,
+                        'assets/images/applogo1.png',
+                        width: 18.h,
+                        height: 18.h,
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.045),
+                  SizedBox(height: screenHeight * 0.02),
 
                   Text(
                     'Login with your mobile number',

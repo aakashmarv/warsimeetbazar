@@ -26,7 +26,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   final PlaceOrderController orderController = Get.put(PlaceOrderController());
   final CartItemController cartController = Get.put(CartItemController());
-  final GetAddressController getAddressController = Get.put(GetAddressController());
+  final GetAddressController getAddressController = Get.put(
+    GetAddressController(),
+  );
+
+  final TextEditingController instructionsController =
+      TextEditingController(); // 👈 Added
 
   AddressModel? selectedAddress;
 
@@ -67,7 +72,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       /// 👇 Body + FloatingCartBarWidget combined
       body: Stack(
         children: [
-          /// 🧾 Main checkout UI (no change)
+          /// 🧾 Main checkout UI
           Obx(() {
             if (cartController.isLoading.value) {
               return const Center(child: CircularProgressIndicator());
@@ -99,9 +104,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 1.h),
-                  // Address Section
+
+                  // 🏠 Address Section
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 2.w,
+                      vertical: 2.5.w,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.borderGrey, width: 1),
@@ -136,8 +145,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         TextButton(
                           onPressed: () async {
                             if (hasAddress) {
-                              final selected = await Get.toNamed(AppRoutes.savedaddresses);
-                              if (selected != null && selected is AddressModel) {
+                              final selected = await Get.toNamed(
+                                AppRoutes.savedaddresses,
+                              );
+                              if (selected != null &&
+                                  selected is AddressModel) {
                                 getAddressController.selectAddress(selected.id);
                               }
                             } else {
@@ -157,14 +169,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                     ),
                   ),
+
                   SizedBox(height: 2.h),
 
-                  // Cart Items
+                  // 🧾 Order Summary
                   Text(
                     "Order Summary",
-                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   SizedBox(height: 1.h),
+
                   Expanded(
                     child: ListView.separated(
                       itemCount: items.length,
@@ -188,7 +205,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   height: 8.h,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) =>
-                                  const Icon(Icons.image, size: 40),
+                                      const Icon(Icons.image, size: 40),
                                 ),
                               ),
                               SizedBox(width: 3.w),
@@ -216,7 +233,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     SizedBox(height: 0.5.h),
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Qty: ${item.quantity}",
@@ -245,13 +262,49 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
 
                   SizedBox(height: 2.h),
+
+                  // ✍️ Delivery Instructions
+                  Text(
+                    "Delivery Instructions",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 1.h),
+                  TextField(
+                    controller: instructionsController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText:
+                          "e.g., Please deliver between 5–6 PM or call before delivery",
+                      hintStyle: TextStyle(
+                        fontSize: 13.sp,
+                        color: AppColors.grey,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: AppColors.primary),
+                      ),
+                      contentPadding: EdgeInsets.all(12),
+                    ),
+                  ),
+
+                  SizedBox(height: 2.h),
+
+                  // 💰 Price Summary
                   Container(
                     padding: EdgeInsets.all(3.w),
-                    margin: EdgeInsets.only(top: 1.h, bottom: 16.h), // leave space for bottom bar
+                    margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.white,
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+                      boxShadow: [
+                        BoxShadow(color: Colors.black12, blurRadius: 6),
+                      ],
                     ),
                     child: Column(
                       children: [
@@ -271,40 +324,52 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             );
           }),
 
-          /// 🛒 Floating Cart Bar at bottom (replaces bottomNavigationBar)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
-            child: FloatingCartBarWidget(
-              totalItems: totalItems.obs,
-              totalPrice: totalAmount.obs,
-              buttonText: "Place Order",
-              onTap: () async {
-                if (cartController.cartItems.isEmpty) return;
+            child: Obx(() {
+              return FloatingCartBarWidget(
+                totalItems: totalItems.obs,
+                totalPrice: totalAmount.obs,
+                buttonText: orderController.isLoading.value
+                    ? "Placing Order..."
+                    : "Place Order",
+                isLoading: orderController.isLoading.value, // 👈 new param
+                onTap: () async {
+                  if (orderController.isLoading.value)
+                    return; // prevent double click
+                  if (cartController.cartItems.isEmpty) return;
 
-                final prefs = await SharedPreferencesService.getInstance();
-                final latitude = prefs.getDouble(AppKeys.latitude);
-                final longitude = prefs.getDouble(AppKeys.longitude);
-                final selectedAddressId = getAddressController.selectedAddressId.value;
+                  final prefs = await SharedPreferencesService.getInstance();
+                  final latitude = prefs.getDouble(AppKeys.latitude);
+                  final longitude = prefs.getDouble(AppKeys.longitude);
+                  final selectedAddressId =
+                      getAddressController.selectedAddressId.value;
 
-                final request = PlaceOrderRequest(
-                  address: selectedAddressId,
-                  latitude: latitude,
-                  longitude: longitude,
-                );
+                  final request = PlaceOrderRequest(
+                    address: selectedAddressId,
+                    latitude: latitude,
+                    longitude: longitude,
+                    instructions: instructionsController.text,
+                  );
 
-                await orderController.placeOrderCont(request);
-              },
-            ),
+                  await orderController.placeOrderCont(request);
+                },
+              );
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _priceRow(String title, double value,
-      {bool isBold = false, Color? color}) {
+  Widget _priceRow(
+    String title,
+    double value, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -327,4 +392,3 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 }
-

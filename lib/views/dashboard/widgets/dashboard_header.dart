@@ -39,7 +39,7 @@ class DashboardHeader extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.location_on, color: AppColors.alertRed),
+                    const Icon(Icons.location_on, color: AppColors.primary),
                     SizedBox(width: screenWidth * 0.01),
                     Text(
                       street,
@@ -64,10 +64,10 @@ class DashboardHeader extends StatelessWidget {
             ),
           ),
           Image.asset(
-            "assets/images/logo_cb_black.png",
-            height: screenWidth * 0.10,
+            "assets/images/applogo1.png",
+            height: screenWidth * 0.14,
             width: screenWidth * 0.18,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         ],
       ),

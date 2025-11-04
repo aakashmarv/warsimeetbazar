@@ -85,9 +85,9 @@ Future<void> _initialize() async {
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(imageSize * 0.25),
+                  borderRadius: BorderRadius.circular(imageSize * 0.20),
                   child: Image.asset(
-                    'assets/images/splashlogo.png',
+                    'assets/images/applogo1.png',
                     height: imageSize,
                     width: imageSize,
                     fit: BoxFit.cover,

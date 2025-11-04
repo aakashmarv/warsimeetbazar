@@ -16,23 +16,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int currentIndex = 0;
 
-  final List<Map<String, String>> onboardingData = [
-    {
-      "image": "assets/images/onbordImages/o1.jpg",
-      "title": "Fresh from the Ocean to Your Plate",
-      "subtitle": "Directly sourced, responsibly delivered.",
-    },
-    {
-      "image": "assets/images/onbordImages/o2.jpg",
-      "title": "Pure. Sun-dried. Chemical-free.",
-      "subtitle": "Only the best catch, selected for you.",
-    },
-    {
-      "image": "assets/images/onbordImages/o3.jpg",
-      "title": "The Chavan Promise",
-      "subtitle": "From the shore to your door, on time.",
-    },
-  ];
+ final List<Map<String, String>> onboardingData = [
+  {
+    "image": "assets/images/onbordImages/ob1.jpeg",
+    "title": "Welcome to Warsi Meest Bajar",
+    "subtitle": "Your trusted digital marketplace for daily needs.",
+  },
+  {
+    "image": "assets/images/onbordImages/ob2.jpeg",
+    "title": "Shop Smart, Shop Local",
+    "subtitle": "Explore fresh groceries, essentials, and more from nearby stores.",
+  },
+  {
+    "image": "assets/images/onbordImages/ob3.jpeg",
+    "title": "Fast Delivery. Secure Payments.",
+    "subtitle": "Enjoy doorstep delivery and easy UPI checkout — all in one app.",
+  },
+];
+
 
   @override
   Widget build(BuildContext context) {

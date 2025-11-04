@@ -1,4 +1,4 @@
 class AppStrings {
-  static const String appName = 'Dry Fish';
+  static const String appName = 'Warsi User';
 // Add more string resources here...
 }

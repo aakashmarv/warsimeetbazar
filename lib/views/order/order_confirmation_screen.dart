@@ -19,7 +19,7 @@ class OrderConfirmationScreen extends StatefulWidget {
 }
 
 class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
-  int timerSeconds = 60;
+  int timerSeconds = 30;
   bool showSuccessAnimation = true;
   Timer? countdownTimer;
   final Order? order = Get.arguments as Order?;
@@ -506,7 +506,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'Deliciously Yours, Fish',
+                          'Deliciously Yours, Meet',
                           style: TextStyle(color: AppColors.black),
                         ),
                       ],

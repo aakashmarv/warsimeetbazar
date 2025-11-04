@@ -15,12 +15,9 @@ class PlaceOrderController extends GetxController {
     try {
       final response = await _repository.placeOrder(request);
 
-      if (response.status?.toLowerCase() == "success") {
+      if (response.status == "success") {
         order.value = response.order;
-        Get.offAllNamed(
-          AppRoutes.orderConfirmer,
-          arguments: response.order,
-        );
+        Get.offAllNamed(AppRoutes.orderConfirmer, arguments: response.order);
       } else {
         SnackbarUtil.showError(
           "Order Failed",
@@ -32,7 +29,7 @@ class PlaceOrderController extends GetxController {
         "Error",
         "An unexpected error occurred: ${e.toString()}",
       );
-
+      print("Error placing order: $e"); // ✅ this is valid
     } finally {
       isLoading.value = false;
     }

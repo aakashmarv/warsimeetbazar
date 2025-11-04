@@ -470,8 +470,7 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
       await _addressController.addNewAddress(request);
 
       if (_addressController.addNewAddressResponse?.status == true) {
-        controller.fetchAddresses();
-        Get.until((route) => Get.currentRoute == AppRoutes.savedaddresses);
+        Navigator.pop(context);
       }
     }
   }

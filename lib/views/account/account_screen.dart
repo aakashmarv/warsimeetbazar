@@ -454,36 +454,36 @@ class _AccountScreenState extends State<AccountScreen> {
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        style: GoogleFonts.nunito(fontSize: 20.sp),
+                        style: GoogleFonts.nunito(fontSize: 20.sp, fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "CHAVAN ",
+                            text: "WARSI MEET ",
                             style: const TextStyle(color: AppColors.black),
                           ),
                           TextSpan(
-                            text: "BROTHER'S",
+                            text: "BAZAR",
                             style: TextStyle(color: AppColors.primary),
                           ),
                         ],
                       ),
                     ),
-                    Text(
-                      "GROUP OF JEEVAN AGRO",
-                      style: GoogleFonts.nunito(
-                        fontSize: 12.sp,
-                        color: Colors.black,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    SizedBox(height: 0.5.h),
-                    Text(
-                      "v8.0.0.0",
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    SizedBox(height: 2.h),
+                    // Text(
+                    //   "GROUP OF JEEVAN AGRO",
+                    //   style: GoogleFonts.nunito(
+                    //     fontSize: 12.sp,
+                    //     color: Colors.black,
+                    //     letterSpacing: 1,
+                    //   ),
+                    // ),
+                    // SizedBox(height: 0.5.h),
+                    // Text(
+                    //   "v8.0.0.0",
+                    //   style: TextStyle(
+                    //     fontSize: 14.sp,
+                    //     color: Colors.grey[600],
+                    //   ),
+                    // ),
+                    // SizedBox(height: 2.h),
                   ],
                 ),
               ),
