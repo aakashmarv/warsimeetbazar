@@ -1,6 +1,7 @@
 import 'package:dry_fish/roots/routes.dart';
 import 'package:dry_fish/views/cart/widgets/floating_cart_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
@@ -295,12 +296,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                   SizedBox(height: 2.h),
 
-                  // 💰 Price Summary
                   Container(
                     padding: EdgeInsets.all(3.w),
                     margin: EdgeInsets.only(top: 1.h, bottom: 16.h),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                           borderRadius: BorderRadius.circular(12),
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(color: Colors.black12, blurRadius: 6),
@@ -323,7 +323,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           }),
-
           Positioned(
             left: 0,
             right: 0,
@@ -335,26 +334,164 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 buttonText: orderController.isLoading.value
                     ? "Placing Order..."
                     : "Place Order",
-                isLoading: orderController.isLoading.value, // 👈 new param
+                isLoading: orderController.isLoading.value,
                 onTap: () async {
-                  if (orderController.isLoading.value)
-                    return; // prevent double click
+                  if (orderController.isLoading.value) return;
                   if (cartController.cartItems.isEmpty) return;
 
-                  final prefs = await SharedPreferencesService.getInstance();
-                  final latitude = prefs.getDouble(AppKeys.latitude);
-                  final longitude = prefs.getDouble(AppKeys.longitude);
-                  final selectedAddressId =
-                      getAddressController.selectedAddressId.value;
+                  // Show popup dialog first 👇
+                  bool? isConfirmed = await showDialog<bool>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      bool isChecked = false;
 
-                  final request = PlaceOrderRequest(
-                    address: selectedAddressId,
-                    latitude: latitude,
-                    longitude: longitude,
-                    instructions: instructionsController.text,
+                      return StatefulBuilder(
+                        builder: (context, setState) {
+                          final RxBool copied = false.obs;
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: const Text(
+                              "Scan to Pay",
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  "assets/images/qr.jpeg",
+                                  width: 30.h,
+                                  height: 30.h,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 16),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        "warsimeatbazaar@oksbi",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Obx(
+                                        () => InkWell(
+                                          onTap: () async {
+                                            await Clipboard.setData(
+                                              const ClipboardData(
+                                                text: "warsimeatbazaar@oksbi",
+                                              ),
+                                            );
+                                            copied.value = true;
+                                            Future.delayed(
+                                              const Duration(seconds: 1),
+                                              () {
+                                                if (copied.value)
+                                                  copied.value = false;
+                                              },
+                                            );
+                                          },
+                                          child: Icon(
+                                            copied.value
+                                                ? Icons.check_circle
+                                                : Icons.copy,
+                                            size: 20,
+                                            color: copied.value
+                                                ? AppColors.confirmGreen
+                                                : AppColors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Checkbox(
+                                      value: isChecked,
+                                      activeColor: Colors.green,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          isChecked = val ?? false;
+                                        });
+                                      },
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        "I confirm that the payment is done.",
+                                        style: TextStyle(fontSize: 15),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isChecked
+                                      ? AppColors.confirmGreen
+                                      : AppColors.grey,
+                                  foregroundColor: AppColors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: isChecked
+                                    ? () => Navigator.pop(context, true)
+                                    : null,
+                                child: const Text("Confirm",  style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
 
-                  await orderController.placeOrderCont(request);
+                  // If user confirmed payment
+                  if (isConfirmed == true) {
+                    final prefs = await SharedPreferencesService.getInstance();
+                    final latitude = prefs.getDouble(AppKeys.latitude);
+                    final longitude = prefs.getDouble(AppKeys.longitude);
+                    final selectedAddressId =
+                        getAddressController.selectedAddressId.value;
+
+                    final request = PlaceOrderRequest(
+                      address: selectedAddressId,
+                      latitude: latitude,
+                      longitude: longitude,
+                      instructions: instructionsController.text,
+                    );
+
+                    await orderController.placeOrderCont(request);
+                  }
                 },
               );
             }),

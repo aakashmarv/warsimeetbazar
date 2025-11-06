@@ -1,4 +1,4 @@
-package com.cb.chavanbrothersseafood
+package com.wmt.warsimeetbazar
 
 import io.flutter.embedding.android.FlutterActivity
 

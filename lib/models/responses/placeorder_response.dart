@@ -1,5 +1,5 @@
 class PlaceorderResponse {
-  final bool? status; // 👈 Change type to bool
+  final String? status;
   final String? message;
   final Order? order;
 
@@ -11,19 +11,8 @@ class PlaceorderResponse {
 
   factory PlaceorderResponse.fromJson(Map<String, dynamic> json) {
     final orderData = json['order'];
-
-    // 👇 Handle both bool and string cases safely
-    bool? parsedStatus;
-    final rawStatus = json['status'];
-    if (rawStatus is bool) {
-      parsedStatus = rawStatus;
-    } else if (rawStatus is String) {
-      parsedStatus =
-          rawStatus.toLowerCase() == 'true' || rawStatus.toLowerCase() == 'success';
-    }
-
     return PlaceorderResponse(
-      status: parsedStatus,
+      status: json['status'] as String?,
       message: json['message'] as String?,
       order: (orderData is Map<String, dynamic>)
           ? Order.fromJson(orderData)
@@ -35,11 +24,10 @@ class PlaceorderResponse {
     return {
       'status': status,
       'message': message,
-      'order': order?.toJson(),
+      'order': order?.toJson(),                                    
     };
   }
 }
-
 
 class Order {
   final int? id;

@@ -56,7 +56,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           );
         }
 
-        final orders = orderListController.orders;
+        final orders = orderListController.orders.reversed.toList();
 
         return ListView.builder(
           padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12.h),

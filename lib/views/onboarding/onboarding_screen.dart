@@ -19,7 +19,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
  final List<Map<String, String>> onboardingData = [
   {
     "image": "assets/images/onbordImages/ob1.jpeg",
-    "title": "Welcome to Warsi Meest Bajar",
+    "title": "Welcome to Warsi Meest Bazar",
     "subtitle": "Your trusted digital marketplace for daily needs.",
   },
   {

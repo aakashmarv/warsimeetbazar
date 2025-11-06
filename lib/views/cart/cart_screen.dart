@@ -22,7 +22,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final CartItemController cartitemController = Get.find<CartItemController>();
+  final CartItemController cartitemController = Get.put(CartItemController());
   final RemoveCartItemController removeCartItemController = Get.put(
     RemoveCartItemController(),
   );
@@ -41,9 +41,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      cartitemController.fetchItems();
-    });
+    cartitemController.fetchItems();
   }
 
   @override
@@ -236,7 +234,7 @@ class _CartScreenState extends State<CartScreen> {
                                           onPressed: isDecLoading
                                               ? null
                                               : () async {
-                                                  if (item.quantity > 1) {
+                                                  if (item.quantity > 0) {
                                                     decreaseLoading[id] = true;
 
                                                     final oldQty =
@@ -250,7 +248,11 @@ class _CartScreenState extends State<CartScreen> {
                                                         0.0;
                                                     item.total =
                                                         price * item.quantity;
-
+                                                    if (item.quantity == 0) {
+                                                      cartitemController
+                                                          .cartItems
+                                                          .removeAt(index);
+                                                    }
                                                     cartitemController.update();
 
                                                     await reduceQuantityController
