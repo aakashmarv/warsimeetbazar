@@ -30,6 +30,8 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final _pincodeController = TextEditingController();
   final _localityController = TextEditingController();
 
+  final currentAddress = Get.arguments?['currentAddress'] as String?;
+
   final AddNewAddressController _addressController = Get.put(
     AddNewAddressController(),
   );
@@ -42,26 +44,85 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   AddressModel? editModel; // <-- yaha model store hoga
   bool isEditMode = false;
 
+
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
-    editModel = Get.arguments as AddressModel?;
-    if (editModel != null) {
-      isEditMode = true;
+  final args = Get.arguments ?? {};
+  editModel = args['model'] as AddressModel?;
+  final currentAddress = args['currentAddress'] as String?;
 
-      _nameController.text = editModel!.name;
-      _mobileController.text = editModel!.phone.replaceAll("+91-", "");
-      _houseController.text = editModel!.flat;
-      _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
-      _buildingController.text = editModel!.building;
-      _streetController.text = editModel!.street;
-      _landmarkController.text = editModel!.landmark;
-      _pincodeController.text = editModel!.zip;
-      _localityController.text = editModel!.locality;
-      selectedTag = editModel!.addressType.toUpperCase();
-    }
+  if (editModel != null) {
+    // 🟢 EDIT EXISTING ADDRESS
+    isEditMode = true;
+
+    _nameController.text = editModel!.name;
+    _mobileController.text = editModel!.phone.replaceAll("+91-", "");
+    _houseController.text = editModel!.flat;
+    _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
+    _buildingController.text = editModel!.building;
+    _streetController.text = editModel!.street;
+    _landmarkController.text = editModel!.landmark;
+    _pincodeController.text = editModel!.zip;
+    _localityController.text = editModel!.locality;
+    selectedTag = editModel!.addressType.toUpperCase();
+
+  } else if (currentAddress != null && currentAddress.isNotEmpty) {
+    // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
+    final parts = currentAddress.split(',');
+
+    _nameController.text = " ";
+    _mobileController.text = " ";
+    _houseController.text = " ";
+    _buildingController.text = " ";
+    _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
+    _landmarkController.text = " ";
+    _localityController.text = parts.length > 0 ? parts[0].trim() : "Building";
+    _blockController.text = " ";
+    _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
+    selectedTag = "HOME";
   }
+}
+
+
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   final args = Get.arguments ?? {};
+  //   editModel = args['model'] as AddressModel?;
+  //   final currentAddress = args['currentAddress'] as String?;
+
+  //   if (editModel != null) {
+  //     isEditMode = true;
+
+  //     _nameController.text = editModel!.name;
+  //     _mobileController.text = editModel!.phone.replaceAll("+91-", "");
+  //     _houseController.text = editModel!.flat;
+  //     _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
+  //     _buildingController.text = editModel!.building;
+  //     _streetController.text = editModel!.street;
+  //     _landmarkController.text = editModel!.landmark;
+  //     _pincodeController.text = editModel!.zip;
+  //     _localityController.text = editModel!.locality;
+  //     selectedTag = editModel!.addressType.toUpperCase();
+  //   } else if (currentAddress != null && currentAddress.isNotEmpty) {
+  //  // Split currentAddress into parts for autofill
+  //   final parts = currentAddress.split(',');
+
+  //   _nameController.text = "My Address"; // default name
+  //   _mobileController.text = "9999999999"; // default number (you can use user’s saved number if available)
+  //   _houseController.text = parts.isNotEmpty ? parts[0].trim() : "House";
+  //   _buildingController.text = parts.length > 1 ? parts[1].trim() : "Building";
+  //   _streetController.text = parts.length > 2 ? parts[2].trim() : currentAddress;
+  //   _landmarkController.text = parts.length > 3 ? parts[3].trim() : "Near Landmark";
+  //   _localityController.text = parts.length > 4 ? parts[4].trim() : "Locality";
+  //   _blockController.text = parts.length > 5 ? parts[5].trim() : "State";
+  //   _pincodeController.text = parts.length > 6 ? parts[6].trim() : "000000";
+  //     selectedTag = editModel!.addressType.toUpperCase();      
+  //   }
+  // }
 
   @override
   void dispose() {

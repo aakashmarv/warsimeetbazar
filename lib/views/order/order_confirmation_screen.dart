@@ -491,7 +491,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Deliciously Yours, Fish',
+                            'Deliciously Yours, Meet bn    ',
                             style: TextStyle(color: AppColors.black),
                           ),
                         ],

@@ -153,7 +153,15 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            "${item.product.weight} kg  |  Qty: ${item.quantity}",
+                                            "${item.weight} KG  |  Qty: ${item.quantity}",
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                           const SizedBox(height: 6),
+                                          Text(
+                                            "Cutting: ${item.cuttingType}",
                                             style: TextStyle(
                                               fontSize: 14.sp,
                                               color: Colors.grey[600],

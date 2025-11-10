@@ -1,7 +1,7 @@
 class ApiConstants {
   // Base URL
-  static const String baseUrl = "https://chavanbrothers.co.in/api";
-  static const String imageBaseUrl = "https://chavanbrothers.co.in/";
+  static const String baseUrl = "https://warsi.marvsoftwares.in/api";
+  static const String imageBaseUrl = "https://warsi.marvsoftwares.in/";
 
   // Endpoints
   static const String loginUrl = "$baseUrl/user/login";
