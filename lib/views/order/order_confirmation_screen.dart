@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import '../../constants/api_constants.dart';
 import '../../models/responses/placeorder_response.dart';
 import '../../viewmodels/cancel_order_controller.dart';
+
 class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({super.key});
 
@@ -142,7 +143,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
                                 // ✅ Show response
                                 if (_cancelOrderController.isCancelled.value) {
-                                                               } else {
+                                } else {
                                   Get.snackbar(
                                     "Failed",
                                     _cancelOrderController.message.value,
@@ -462,7 +463,11 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '₹ ${order?.orderItems?.first.total?.toStringAsFixed(2) ?? '0.00'}',
+                                  '₹ ${(() {
+                                    final total = order?.orderItems.first.total;
+                                    if (total == null) return '0.00';
+                                    return double.tryParse(total.toString())?.toStringAsFixed(2) ?? '0.00';
+                                  })()}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 16,

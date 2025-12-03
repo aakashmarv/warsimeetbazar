@@ -457,7 +457,7 @@ class _AccountScreenState extends State<AccountScreen> {
                         style: GoogleFonts.nunito(fontSize: 20.sp, fontWeight: FontWeight.bold),
                         children: [
                           TextSpan(
-                            text: "WARSI MEET ",
+                            text: "WARSI MEAT ",
                             style: const TextStyle(color: AppColors.black),
                           ),
                           TextSpan(
