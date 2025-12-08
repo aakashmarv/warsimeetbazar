@@ -23,118 +23,120 @@ class ContactUsScreen extends StatelessWidget {
           color: AppColors.white
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              height: 14.h,
-              width: 14.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.extraLightestPrimary,
-              ),
-              child: Icon(
-                Icons.support_agent,
-                size: 40.sp,
-                color: AppColors.primary,
-              ),
-            ),
-            SizedBox(height: 2.h),
-
-            Text(
-              "We’re here to help !",
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 1.h),
-            Text(
-              "If you have any questions or need support, feel free to reach us.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[500],
-              ),
-            ),
-
-            SizedBox(height: 3.h),
-
-            /// Contact Options
-            _contactTile(
-              icon: Icons.call,
-              title: "Call Us",
-              value: "+91 98765 43210",
-              onTap: () {},
-            ),
-            _contactTile(
-              icon: Icons.email_outlined,
-              title: "Email",
-              value: "support@fishmart.com",
-              onTap: () {},
-            ),
-            _contactTile(
-              icon: Icons.whatshot,
-              title: "WhatsApp",
-              value: "+91 98765 43210",
-              onTap: () {},
-            ),
-            _contactTile(
-              icon: Icons.location_on_outlined,
-              title: "Address",
-              value: "Salt Lake, Kolkata, West Bengal",
-              onTap: () {},
-            ),
-
-            SizedBox(height: 4.h),
-
-            /// Contact Form
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Send us a message",
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-              ),
-            ),
-            SizedBox(height: 2.h),
-
-            _inputField(label: "Name"),
-            SizedBox(height: 1.5.h),
-            _inputField(label: "Email"),
-            SizedBox(height: 1.5.h),
-            _inputField(label: "Message", maxLines: 3),
-
-            SizedBox(height: 3.h),
-
-            /// Submit Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 1.6.h),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: 14.h,
+                width: 14.h,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.extraLightestPrimary,
                 ),
-                onPressed: () {
-                  // TODO: handle submit
-                },
+                child: Icon(
+                  Icons.support_agent,
+                  size: 40.sp,
+                  color: AppColors.primary,
+                ),
+              ),
+              SizedBox(height: 2.h),
+        
+              Text(
+                "We’re here to help !",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                "If you have any questions or need support, feel free to reach us.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[500],
+                ),
+              ),
+        
+              SizedBox(height: 3.h),
+        
+              /// Contact Options
+              _contactTile(
+                icon: Icons.call,
+                title: "Call Us",
+                value: "+91 98765 43210",
+                onTap: () {},
+              ),
+              _contactTile(
+                icon: Icons.email_outlined,
+                title: "Email",
+                value: "support@fishmart.com",
+                onTap: () {},
+              ),
+              _contactTile(
+                icon: Icons.whatshot,
+                title: "WhatsApp",
+                value: "+91 98765 43210",
+                onTap: () {},
+              ),
+              _contactTile(
+                icon: Icons.location_on_outlined,
+                title: "Address",
+                value: "Salt Lake, Kolkata, West Bengal",
+                onTap: () {},
+              ),
+        
+              SizedBox(height: 4.h),
+        
+              /// Contact Form
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Text(
-                  "Submit",
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                  "Send us a message",
+                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+                ),
+              ),
+              SizedBox(height: 2.h),
+        
+              _inputField(label: "Name"),
+              SizedBox(height: 1.5.h),
+              _inputField(label: "Email"),
+              SizedBox(height: 1.5.h),
+              _inputField(label: "Message", maxLines: 3),
+        
+              SizedBox(height: 3.h),
+        
+              /// Submit Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 1.6.h),
+                  ),
+                  onPressed: () {
+                    // TODO: handle submit
+                  },
+                  child: Text(
+                    "Submit",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

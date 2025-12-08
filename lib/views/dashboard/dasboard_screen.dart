@@ -9,6 +9,7 @@ import 'package:dry_fish/views/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
@@ -58,8 +59,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await checkForUpdate();
       await getAddressController.fetchAddresses();
-      // 🔹 If user already has saved addresses → skip location sheet
       if (getAddressController.addresses.isNotEmpty) {
         final selected = getAddressController.selectedAddress;
         if (selected != null) {
@@ -77,6 +78,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _cartItemController.fetchItems();
     });
   }
+
+  Future<void> checkForUpdate() async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (info.flexibleUpdateAllowed) {
+          await startFlexibleUpdate();
+        } else if (info.immediateUpdateAllowed) {
+          await startImmediateUpdate();
+        }
+      }
+    } catch (e, st) {
+      debugPrint('Update check failed: $e\n$st');
+    }
+  }
+
+  Future<void> startFlexibleUpdate() async {
+    try {
+      final result = await InAppUpdate.startFlexibleUpdate();
+
+      if (result == AppUpdateResult.success) {
+        await InAppUpdate.completeFlexibleUpdate();
+      }
+    } catch (e, st) {
+      debugPrint('Flexible update failed: $e\n$st');
+    }
+  }
+
+  Future<void> startImmediateUpdate() async {
+    try {
+      await InAppUpdate.performImmediateUpdate();
+    } catch (e, st) {
+      debugPrint('Immediate update failed: $e\n$st');
+    }
+  }
+
 
   /// 🔹 Location Bottom Sheet
   void _showLocationBottomSheet() {
@@ -123,12 +161,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //   return;
     // }
 
-    var notificationStatus = await Permission.notification.request();
-    if (notificationStatus.isDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Notification permission is required")),
-      );
-    }
+    // var notificationStatus = await Permission.notification.request();
+    // if (notificationStatus.isDenied) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text("Notification permission is required")),
+    //   );
+    // }
   }
 
   // void _openMapView() {

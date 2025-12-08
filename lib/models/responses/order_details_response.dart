@@ -41,7 +41,7 @@ class OrderData {
   final String? dispatchedAt;
   final String? deliveredAt;
   final String? cancelledAt;
-  final int address;
+  final String address;
   final String createdAt;
   final String updatedAt;
   final List<OrderItem> orderItems;

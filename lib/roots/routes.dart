@@ -11,7 +11,7 @@ import 'package:dry_fish/views/order/order_confirmation_screen.dart';
 import 'package:dry_fish/views/order/order_history_screen.dart';
 import 'package:dry_fish/views/order/order_tracking_screen.dart';
 import 'package:dry_fish/views/products/product_detail_screen.dart';
-import 'package:dry_fish/views/products/product_list_screen.dart';
+import 'package:dry_fish/views/products/product_list_screen%20_categorywise.dart';
 import 'package:dry_fish/views/search_screen.dart';
 import 'package:dry_fish/views/splash_screen.dart';
 import 'package:get/get.dart';

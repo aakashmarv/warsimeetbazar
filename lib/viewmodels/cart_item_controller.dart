@@ -14,6 +14,7 @@ class CartItemController extends GetxController {
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
   // RxDouble totalitemPrice = 0.0.obs;
+   double get totalAmount => totalPrice.value;
 
   final Map<int, RxBool> itemLoading = {};
 

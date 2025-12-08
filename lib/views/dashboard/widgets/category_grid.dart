@@ -66,6 +66,7 @@ class CategoryGrid extends StatelessWidget {
                   ),
                   SizedBox(height: h * 0.008),
                   Text(category.name ?? "",
+                  maxLines: 2,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.nunito(
                           fontSize: w * 0.030,

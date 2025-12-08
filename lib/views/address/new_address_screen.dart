@@ -1,11 +1,14 @@
-import 'package:dry_fish/Constants/app_colors.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/app_keys.dart';
 import '../../models/requests/add_new_address_request.dart';
 import '../../models/requests/update_address_request.dart';
 import '../../models/responses/get_addresses_response.dart';
 import '../../roots/routes.dart';
+import '../../services/sharedpreferences_service.dart';
 import '../../viewmodels/add_new_addresss_controller.dart';
 import '../../viewmodels/get_address_controller.dart';
 import '../../viewmodels/update_address_controller.dart';
@@ -30,8 +33,6 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final _pincodeController = TextEditingController();
   final _localityController = TextEditingController();
 
-  final currentAddress = Get.arguments?['currentAddress'] as String?;
-
   final AddNewAddressController _addressController = Get.put(
     AddNewAddressController(),
   );
@@ -41,89 +42,80 @@ class _NewAddressScreenState extends State<NewAddressScreen> {
   final controller = Get.put(GetAddressController());
 
   String selectedTag = "HOME";
-  AddressModel? editModel; // <-- yaha model store hoga
+  AddressModel? editModel;
   bool isEditMode = false;
-
-
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  final args = Get.arguments ?? {};
-  editModel = args['model'] as AddressModel?;
-  final currentAddress = args['currentAddress'] as String?;
+    final args = Get.arguments ?? {};
+    editModel = args['model'] as AddressModel?;
+    final currentAddress = args['currentAddress'] as String?;
 
-  if (editModel != null) {
-    // 🟢 EDIT EXISTING ADDRESS
-    isEditMode = true;
+    if (editModel != null) {
+      // 🟢 EDIT EXISTING ADDRESS
+      isEditMode = true;
 
-    _nameController.text = editModel!.name;
-    _mobileController.text = editModel!.phone.replaceAll("+91-", "");
-    _houseController.text = editModel!.flat;
-    _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
-    _buildingController.text = editModel!.building;
-    _streetController.text = editModel!.street;
-    _landmarkController.text = editModel!.landmark;
-    _pincodeController.text = editModel!.zip;
-    _localityController.text = editModel!.locality;
-    selectedTag = editModel!.addressType.toUpperCase();
+      _nameController.text = editModel!.name;
+      _mobileController.text = editModel!.phone.replaceAll("+91-", "");
+      _houseController.text = editModel!.flat;
+      _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
+      _buildingController.text = editModel!.building;
+      _streetController.text = editModel!.street;
+      _landmarkController.text = editModel!.landmark;
+      _pincodeController.text = editModel!.zip;
+      _localityController.text = editModel!.locality;
+      selectedTag = editModel!.addressType.toUpperCase();
+    } else if (currentAddress != null && currentAddress.isNotEmpty) {
+      // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
+      final parts = currentAddress.split(',');
 
-  } else if (currentAddress != null && currentAddress.isNotEmpty) {
-    // 🟡 NEW ADDRESS BASED ON CURRENT LOCATION STRING
-    final parts = currentAddress.split(',');
+      _nameController.text = " ";
+      _mobileController.text = " ";
+      _houseController.text = " ";
+      _buildingController.text = " ";
+      _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
+      _landmarkController.text = " ";
+      _localityController.text = parts.length > 0
+          ? parts[0].trim()
+          : "Building";
+      _blockController.text = " ";
+      _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
+      selectedTag = "HOME";
+    }
+    // Print and fetch actual user data
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferencesService.getInstance();
 
-    _nameController.text = " ";
-    _mobileController.text = " ";
-    _houseController.text = " ";
-    _buildingController.text = " ";
-    _streetController.text = parts.length > 1 ? parts[1].trim() : "Building";
-    _landmarkController.text = " ";
-    _localityController.text = parts.length > 0 ? parts[0].trim() : "Building";
-    _blockController.text = " ";
-    _pincodeController.text = parts.length > 4 ? parts[4].trim() : "000000";
-    selectedTag = "HOME";
+      // Fetch user data
+      final userData = prefs.getString(
+        AppKeys.user,
+      ); // usually mobile is inside 'user'
+      print("User Data from SharedPreferences: $userData");
+
+      if (userData != null && userData.isNotEmpty) {
+        try {
+          final Map<String, dynamic> userMap = Map<String, dynamic>.from(
+            jsonDecode(userData) as Map<String, dynamic>,
+          );
+          final mobile = userMap['phone'] as String?;
+          final name = userMap['name'] as String?;
+          print("Mobile from SharedPreferences: $mobile");
+          if (mobile != null &&
+              mobile.isNotEmpty &&
+              name != null &&
+              name.isNotEmpty) {
+            setState(() {
+              _mobileController.text = mobile;
+              _nameController.text = name;
+            });
+          }
+        } catch (e) {
+          print("Error parsing user data: $e");
+        }
+      }
+    });
   }
-}
-
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   final args = Get.arguments ?? {};
-  //   editModel = args['model'] as AddressModel?;
-  //   final currentAddress = args['currentAddress'] as String?;
-
-  //   if (editModel != null) {
-  //     isEditMode = true;
-
-  //     _nameController.text = editModel!.name;
-  //     _mobileController.text = editModel!.phone.replaceAll("+91-", "");
-  //     _houseController.text = editModel!.flat;
-  //     _blockController.text = editModel!.state == "N/A" ? "" : editModel!.state;
-  //     _buildingController.text = editModel!.building;
-  //     _streetController.text = editModel!.street;
-  //     _landmarkController.text = editModel!.landmark;
-  //     _pincodeController.text = editModel!.zip;
-  //     _localityController.text = editModel!.locality;
-  //     selectedTag = editModel!.addressType.toUpperCase();
-  //   } else if (currentAddress != null && currentAddress.isNotEmpty) {
-  //  // Split currentAddress into parts for autofill
-  //   final parts = currentAddress.split(',');
-
-  //   _nameController.text = "My Address"; // default name
-  //   _mobileController.text = "9999999999"; // default number (you can use user’s saved number if available)
-  //   _houseController.text = parts.isNotEmpty ? parts[0].trim() : "House";
-  //   _buildingController.text = parts.length > 1 ? parts[1].trim() : "Building";
-  //   _streetController.text = parts.length > 2 ? parts[2].trim() : currentAddress;
-  //   _landmarkController.text = parts.length > 3 ? parts[3].trim() : "Near Landmark";
-  //   _localityController.text = parts.length > 4 ? parts[4].trim() : "Locality";
-  //   _blockController.text = parts.length > 5 ? parts[5].trim() : "State";
-  //   _pincodeController.text = parts.length > 6 ? parts[6].trim() : "000000";
-  //     selectedTag = editModel!.addressType.toUpperCase();      
-  //   }
-  // }
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -360,10 +352,10 @@ void initState() {
             maxLength: maxLength,
             onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
             decoration: InputDecoration(
-              isDense: true, // reduces height
-              visualDensity: VisualDensity(
-                vertical: -1,
-              ), // make it even more compact
+              isDense: true,
+              // reduces height
+              visualDensity: VisualDensity(vertical: -1),
+              // make it even more compact
               hintText: hint,
               counterText: maxLength != null ? "" : null,
               hintStyle: TextStyle(
@@ -387,7 +379,10 @@ void initState() {
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(size.width * 0.02),
-                borderSide: const BorderSide(color: Colors.red, width: 1.2),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 1.2,
+                ),
               ),
             ),
           ),
@@ -442,7 +437,8 @@ void initState() {
                   decoration: InputDecoration(
                     hintText: "9760203435",
                     counterText: "",
-                    isDense: true, // reduces height
+                    isDense: true,
+                    // reduces height
                     visualDensity: VisualDensity(vertical: -1),
                     hintStyle: TextStyle(
                       fontSize: width * 0.035,
@@ -465,6 +461,13 @@ void initState() {
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(width * 0.02),
                       borderSide: const BorderSide(color: Colors.red, width: 1),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(width * 0.02),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.2,
+                      ),
                     ),
                   ),
                 ),

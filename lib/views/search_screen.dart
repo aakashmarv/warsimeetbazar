@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Constants/app_colors.dart';
@@ -129,7 +130,7 @@ class _SearchScreenState extends State<SearchScreen>
                   Expanded(
                     child: Obx(() {
                       if (_categoryController.isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return _buildShimmerGrid();
                       }
 
                       final filtered = _categoryController.categoryList
@@ -222,6 +223,59 @@ class _SearchScreenState extends State<SearchScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerGrid() {
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: 12, // Show 12 shimmer items (3 rows of 4)
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 3.w,
+        mainAxisSpacing: 2.h,
+        childAspectRatio: 0.75,
+      ),
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Circular image placeholder
+              Container(
+                height: 18.w,
+                width: 18.w,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              // Text placeholder
+              Container(
+                width: 14.w,
+                height: 14.sp,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              // Optional second line for longer text
+              SizedBox(height: 0.5.h),
+              Container(
+                width: 10.w,
+                height: 10.sp,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

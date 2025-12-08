@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 import '../../Constants/app_colors.dart';
 import '../../constants/api_constants.dart';
@@ -25,26 +26,26 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       backgroundColor: AppColors.bgColor,
       appBar: widget.showAppBar
           ? AppBar(
-        backgroundColor: AppColors.extraLightestPrimary,
-        elevation: 1,
-        centerTitle: true,
-        title: const Text(
-          "Order History",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      )
+              backgroundColor: AppColors.extraLightestPrimary,
+              elevation: 1,
+              centerTitle: true,
+              title: const Text(
+                "Order History",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+            )
           : const CustomTextAppBar(title: "Orders"),
 
       body: Obx(() {
         if (orderListController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: _buildShimmerLoading());
         }
 
         if (orderListController.errorMessage.isNotEmpty) {
@@ -69,7 +70,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
             return InkWell(
               onTap: () {
-Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
+                Get.to(() => OrderDetailScreen(orderId: order.id.toString()));
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
@@ -100,7 +102,12 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));              },
                                   ),
                                   InkWell(
                                     onTap: () {
-Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                                    },
+                                      Get.to(
+                                        () => OrderDetailScreen(
+                                          orderId: order.id.toString(),
+                                        ),
+                                      );
+                                    },
                                     child: Padding(
                                       padding: const EdgeInsets.all(2),
                                       child: Icon(
@@ -171,8 +178,8 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
 
                           final isLast =
                               i ==
-                                  order.orderItems.length -
-                                      1; // ✅ to avoid divider after last item
+                              order.orderItems.length -
+                                  1; // ✅ to avoid divider after last item
 
                           return Column(
                             children: [
@@ -184,7 +191,7 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                 child: IntrinsicHeight(
                                   child: Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       /// IMAGE LEFT
                                       ClipRRect(
@@ -202,9 +209,9 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             /// NAME
                                             Text(
@@ -228,10 +235,10 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                                 children: [
                                                   TextSpan(
                                                     text:
-                                                    "${item.weight ?? '--'} KG",
+                                                        "${item.weight ?? '--'} KG",
                                                     style: TextStyle(
                                                       fontWeight:
-                                                      FontWeight.w500,
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                   const TextSpan(
@@ -251,12 +258,12 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
                                                   ),
                                                   TextSpan(
                                                     text:
-                                                    "Qty: ${item.quantity}",
+                                                        "Qty: ${item.quantity}",
                                                     style: TextStyle(
                                                       fontWeight: FontWeight
                                                           .w600, // ✅ Medium Bold
                                                       color:
-                                                      Colors.grey.shade700,
+                                                          Colors.grey.shade700,
                                                     ),
                                                   ),
                                                 ],
@@ -288,6 +295,192 @@ Get.to(() => OrderDetailScreen(orderId: order.id.toString()));                  
           },
         );
       }),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return ListView.builder(
+      padding: EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 12.h),
+      itemCount: 3, // Show 3 shimmer orders
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Order header shimmer
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 20,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 16,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                height: 16,
+                                width: 16,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                height: 16,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            height: 18,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Order items shimmer (show 2 items per order)
+                  Column(
+                    children: List.generate(2, (i) {
+                      final isLast = i == 1; // For divider logic
+
+                      return Column(
+                        children: [
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Image shimmer
+                                Container(
+                                  width: 24.w,
+                                  height: 7.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                ),
+                                SizedBox(width: 4.w),
+
+                                // Text content shimmer
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[400],
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            height: 16,
+                                            width: 60,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[400],
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            height: 16,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[400],
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            height: 16,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[400],
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          if (!isLast)
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              height: 1,
+                              color: Colors.grey[300],
+                            ),
+                        ],
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
