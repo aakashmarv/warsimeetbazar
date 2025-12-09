@@ -14,7 +14,7 @@ class CartItemController extends GetxController {
   RxInt totalItems = 0.obs;
   RxDouble totalPrice = 0.0.obs;
   // RxDouble totalitemPrice = 0.0.obs;
-   double get totalAmount => totalPrice.value;
+  //  double get totalAmount => totalPrice.value;
 
   final Map<int, RxBool> itemLoading = {};
 
@@ -23,29 +23,56 @@ class CartItemController extends GetxController {
       itemLoading[item.id] ??= false.obs;
         }
   }
+// bool _hasFetched = false;
 
-  Future<void> fetchItems() async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
+Future<void> fetchItems() async {
+  // if (_hasFetched) return; // prevent repeated API calls
+  // _hasFetched = true;
 
-      final response = await _repo.fetchcartItems();
+  try {
+    isLoading.value = true;
+    errorMessage.value = '';
 
-      if (response.success == true) {
-        cartItems.assignAll(response.cart);
-      } else {
-        cartItems.clear();
-      }
-
-      updateTotals();
-      initItemLoaders();
-    } catch (e) {
-      errorMessage.value = 'Error: ${e.toString()}';
-      print("❌ Error fetching cart: $e");
-    } finally {
-      isLoading.value = false;
+    final response = await _repo.fetchcartItems();
+    if (response.success == true) {
+      cartItems.assignAll(response.cart);
+    } else {
+      cartItems.clear();
     }
+
+    updateTotals();
+    initItemLoaders();
+  } catch (e) {
+    errorMessage.value = 'Error: ${e.toString()}';
+    print("❌ Error fetching cart: $e");
+  } finally {
+    isLoading.value = false;
   }
+}
+
+
+  // Future<void> fetchItems() async {
+  //   try {
+  //     isLoading.value = true;
+  //     errorMessage.value = '';
+
+  //     final response = await _repo.fetchcartItems();
+
+  //     if (response.success == true) {
+  //       cartItems.assignAll(response.cart);
+  //     } else {
+  //       cartItems.clear();
+  //     }
+
+  //     updateTotals();
+  //     initItemLoaders();
+  //   } catch (e) {
+  //     errorMessage.value = 'Error: ${e.toString()}';
+  //     print("❌ Error fetching cart: $e");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
 void updateTotals() {
   totalItems.value = cartItems.length;

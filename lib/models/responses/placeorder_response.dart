@@ -29,8 +29,8 @@ class Order {
   final String? deliveryCity;
   final String? deliveryState;
   final String? deliveryPostcode;
-  final String latitude;
-  final String longitude;
+  final String? latitude;
+  final String? longitude;
   final String totalAmount;
   final String address;
   final String paymentStatus;
@@ -54,8 +54,8 @@ class Order {
     required this.deliveryCity,
     required this.deliveryState,
     required this.deliveryPostcode,
-    required this.latitude,
-    required this.longitude,
+     this.latitude,
+     this.longitude,
     required this.totalAmount,
     required this.address,
     required this.paymentStatus,
@@ -81,8 +81,8 @@ class Order {
       deliveryCity: json['delivery_city'],
       deliveryState: json['delivery_state'],
       deliveryPostcode: json['delivery_postcode'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      latitude: json['latitude'].toString(),
+      longitude: json['longitude'].toString(),
       totalAmount: json['total_amount'],
       address: json['address'],
       paymentStatus: json['payment_status'],

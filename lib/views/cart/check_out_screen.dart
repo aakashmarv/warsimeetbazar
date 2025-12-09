@@ -29,6 +29,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late final CartItemController cartController;
 
   final PlaceOrderController orderController = Get.put(PlaceOrderController());
+  // final cartController = Get.putIfAbsent(() => CartItemController());
   final GetAddressController getAddressController = Get.put(
     GetAddressController(),
   );
@@ -38,17 +39,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String? currentAddressprefs;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
-    cartController = Get.find<CartItemController>();
+  cartController = Get.find<CartItemController>();
 
-    Future.microtask(() async {
-      await cartController.fetchItems();
-      await getAddressController.fetchAddresses();
-      setState(() => _isLoading = false);
-    });
-  }
+  Future.microtask(() async {
+    await cartController.fetchItems();
+    await getAddressController.fetchAddresses();
+    setState(() => _isLoading = false);
+  });
+}
+
 
   double get subtotal =>
       cartController.cartItems.fold(0, (sum, item) => sum + item.total);
@@ -96,17 +98,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _floatingCartBar() {
-    return Obx(() {
       return FloatingCartBarWidget(
-        totalItems: totalItems.obs,
-        totalPrice: totalAmount.obs,
+        totalItems: cartController.totalItems,
+        totalPrice: cartController.totalPrice,
         buttonText: orderController.isLoading.value
             ? "Placing Order..."
             : "Place Order",
         isLoading: orderController.isLoading.value,
         onTap: _onPlaceOrder,
       );
-    });
   }
 
   Future<void> _onPlaceOrder() async {
@@ -265,7 +265,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 1.h),
-
+        
             // Address Card
             Container(
               padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.5.w),
@@ -344,7 +344,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ],
               ),
             ),
-
+        
             SizedBox(height: 2.h),
             // 🧾 Order Summary
             Text(
@@ -352,7 +352,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 1.h),
-
+        
             Expanded(
               child: ListView.separated(
                 itemCount: items.length,
@@ -363,7 +363,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   final imageUrl = item.product.image.isNotEmpty
                       ? "${ApiConstants.imageBaseUrl}${item.product.image}"
                       : "assets/images/banner2.jpg";
-
+        
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 1.5.h),
                     child: Row(
@@ -411,8 +411,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                               SizedBox(height: 0.5.h),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Qty: ${item.quantity}",
@@ -439,11 +438,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 },
               ),
             ),
-
+        
             SizedBox(height: 1.h),
             Text("Delivery Instructions"),
             SizedBox(height: 1.h),
-
+        
             TextField(
               controller: instructionsController,
               decoration: InputDecoration(
@@ -460,9 +459,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 contentPadding: EdgeInsets.all(12),
               ),
             ),
-
+        
             SizedBox(height: 2.h),
-
+        
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -483,7 +482,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ],
               ),
             ),
-
+        
             SizedBox(height: 10.h),
           ],
         ),
